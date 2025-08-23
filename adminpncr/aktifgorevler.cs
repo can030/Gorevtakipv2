@@ -1,38 +1,63 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient;
-using Microsoft.Maui.Controls;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Gorevtakipv2.adminpencere
 {
-    public class gecmis : ContentView
+    public class aktifgorevler : ContentView
     {
         private CollectionView gorevListView;
         private sqlbaglanti bgl = new sqlbaglanti();
 
-        public gecmis()
+        public aktifgorevler()
         {
             Color bgDark = Color.FromArgb("#1C1B29");
             Color cardBg = Color.FromArgb("#2A2937");
+            Color textColor = Colors.WhiteSmoke;
 
             gorevListView = new CollectionView
             {
                 ItemTemplate = new DataTemplate(() =>
                 {
-                    var baslikLbl = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold, TextColor = Colors.White };
+                    var baslikLbl = new Label
+                    {
+                        FontSize = 18,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.White
+                    };
                     baslikLbl.SetBinding(Label.TextProperty, "Baslik");
 
-                    var calisanLbl = new Label { FontSize = 14, TextColor = Colors.LightGray };
+                    var calisanLbl = new Label
+                    {
+                        FontSize = 14,
+                        TextColor = Colors.LightGray
+                    };
                     calisanLbl.SetBinding(Label.TextProperty, "Calisan");
 
-                    var zamanLbl = new Label { FontSize = 14, TextColor = Colors.LightGray };
+                    var zamanLbl = new Label
+                    {
+                        FontSize = 14,
+                        TextColor = Colors.LightGray
+                    };
                     zamanLbl.SetBinding(Label.TextProperty, "Zaman");
 
-                    var onemlilikLbl = new Label { FontSize = 14, FontAttributes = FontAttributes.Bold };
+                    var onemlilikLbl = new Label
+                    {
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold
+                    };
                     onemlilikLbl.SetBinding(Label.TextProperty, "Onemlilik");
                     onemlilikLbl.SetBinding(Label.TextColorProperty, "OnemlilikRenk");
 
-                    var aciklamaLbl = new Label { FontSize = 13, TextColor = Colors.WhiteSmoke, LineBreakMode = LineBreakMode.TailTruncation };
+                    var aciklamaLbl = new Label
+                    {
+                        FontSize = 13,
+                        TextColor = Colors.WhiteSmoke,
+                        LineBreakMode = LineBreakMode.TailTruncation
+                    };
                     aciklamaLbl.SetBinding(Label.TextProperty, "Aciklama");
 
                     return new Frame
@@ -40,11 +65,17 @@ namespace Gorevtakipv2.adminpencere
                         CornerRadius = 12,
                         BackgroundColor = cardBg,
                         Margin = new Thickness(10, 5),
-                        HasShadow = true,
                         Content = new StackLayout
                         {
                             Spacing = 6,
-                            Children = { baslikLbl, calisanLbl, zamanLbl, onemlilikLbl, aciklamaLbl }
+                            Children =
+                            {
+                                baslikLbl,
+                                calisanLbl,
+                                zamanLbl,
+                                onemlilikLbl,
+                                aciklamaLbl
+                            }
                         }
                     };
                 })
@@ -57,7 +88,7 @@ namespace Gorevtakipv2.adminpencere
                 {
                     new Label
                     {
-                        Text = "📜 Geçmiş Görevler",
+                        Text = "📋 Aktif Görevler",
                         FontSize = 22,
                         TextColor = Colors.White,
                         FontAttributes = FontAttributes.Bold,
@@ -82,8 +113,8 @@ namespace Gorevtakipv2.adminpencere
                                           p.ad as calisan, g.baslangic_zamani, g.bitis_zamani 
                                    FROM gorevler g 
                                    JOIN personel_bilgi p ON g.calisan_id = p.id 
-                                   WHERE g.bitis_zamani < NOW()
-                                   ORDER BY g.bitis_zamani DESC";
+                                   WHERE g.bitis_zamani >= NOW()
+                                   ORDER BY g.id DESC"; // 📌 en yeni görev en üstte
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     using (var reader = await cmd.ExecuteReaderAsync())
@@ -118,4 +149,14 @@ namespace Gorevtakipv2.adminpencere
         }
     }
 
+    public class GorevModel
+    {
+        public string Baslik { get; set; }
+        public string Calisan { get; set; }
+        public string Zaman { get; set; }
+        public string Onemlilik { get; set; }
+        public Color OnemlilikRenk { get; set; }
+        public string Aciklama { get; set; }
+    }
 }
+

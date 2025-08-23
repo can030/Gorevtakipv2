@@ -11,7 +11,6 @@ namespace Gorevtakipv2
     {
         sqlbaglanti bgl = new sqlbaglanti();
         public Admin()
-
         {
             string adSoyad = Session.AdSoyad;
             string yetki = Session.Yetki;
@@ -29,7 +28,7 @@ namespace Gorevtakipv2
 
             var nameLabel = new Label
             {
-                Text = $"{adSoyad}", // DB'den gelecek
+                Text = $"{adSoyad}",
                 FontSize = 16,
                 FontAttributes = FontAttributes.Bold,
                 HorizontalOptions = LayoutOptions.Center,
@@ -38,7 +37,7 @@ namespace Gorevtakipv2
 
             var roleLabel = new Label
             {
-                Text = $"{yetki}", // DB'den gelecek
+                Text = $"{yetki}",
                 FontSize = 14,
                 TextColor = Colors.Gray,
                 HorizontalOptions = LayoutOptions.Center,
@@ -46,10 +45,11 @@ namespace Gorevtakipv2
             };
 
             // === Menü butonları ===
-            var gorevlerButton = new Button { Text = "Görevler", HeightRequest = 70, };
-            var istatistikButton = new Button { Text = "İstatistik", HeightRequest = 70, };
-            var gecmisButton = new Button { Text = "Geçmiş", HeightRequest = 70, };
-            var kayitButton = new Button { Text = "Kayıt İşlemleri", HeightRequest = 70, };
+            var gorevlerButton = new Button { Text = "Görevler", HeightRequest = 70 };
+            var aktifGorevlerButton = new Button { Text = "Aktif Görevler", HeightRequest = 70 }; // ✅ Yeni buton
+            var istatistikButton = new Button { Text = "İstatistik", HeightRequest = 70 };
+            var gecmisButton = new Button { Text = "Geçmiş", HeightRequest = 70 };
+            var kayitButton = new Button { Text = "Kayıt İşlemleri", HeightRequest = 70 };
             var ayarlarButton = new Button { Text = "Ayarlar", HeightRequest = 70 };
 
             // Sol panel (sidebar)
@@ -65,6 +65,7 @@ namespace Gorevtakipv2
                     nameLabel,
                     roleLabel,
                     gorevlerButton,
+                    aktifGorevlerButton, // ✅ Menüye ekledik
                     istatistikButton,
                     gecmisButton,
                     kayitButton,
@@ -74,26 +75,18 @@ namespace Gorevtakipv2
 
             // === Sağ üst panel (header bar) ===
             var anaSayfaButton = new Button { Text = "🏠️" };
-            anaSayfaButton.Clicked += (s, e) =>
-            {
-
-
-            };
-
             var bildirimButton = new Button { Text = "🔔" };
             var cikisButton = new Button { Text = "⏻" };
             cikisButton.Clicked += async (s, e) =>
             {
                 bool cevap = await DisplayAlert("Çıkış", "Çıkış yapmak istiyor musunuz?", "Evet", "Hayır");
 
-                if (cevap) // kullanıcı "Evet" dedi
+                if (cevap)
                 {
                     Session.AdSoyad = null;
                     Session.Yetki = null;
-
                     Application.Current.MainPage = new Login();
                 }
-                // "Hayır" derse hiçbir şey yapma
             };
 
             var topPanel = new Grid
@@ -126,32 +119,38 @@ namespace Gorevtakipv2
             var contentArea = new ContentView
             {
                 Content = contentLabel,
-
             };
 
             // Menü butonlarına tıklama -> içerik değiştir
             gorevlerButton.Clicked += (s, e) =>
             {
                 contentArea.Content = new adminpencere.gorevpncr();
-
-                // contentArea.Content = new Label { Text = "Görevler Sayfası", FontSize = 40, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
             };
+
+            aktifGorevlerButton.Clicked += (s, e) =>  // ✅ Aktif Görevler butonuna tıklandığında
+            {
+                contentArea.Content = new adminpencere.aktifgorevler();
+            };
+
             istatistikButton.Clicked += (s, e) =>
                 contentArea.Content = new adminpencere.istatik();
+
             gecmisButton.Clicked += (s, e) =>
+                contentArea.Content = new adminpencere.gecmis();
 
             kayitButton.Clicked += (s, e) =>
                 contentArea.Content = new Label { Text = "Kayıt İşlemleri Sayfası", FontSize = 40, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+
             ayarlarButton.Clicked += (s, e) =>
                 contentArea.Content = new Label { Text = "Ayarlar Sayfası", FontSize = 40, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
 
-            // Sağ taraf için ayrı grid (üst panel + içerik)
+            // Sağ taraf için grid (üst panel + içerik)
             var rightSideGrid = new Grid
             {
                 RowDefinitions =
                 {
-                    new RowDefinition { Height = 80 },             // Üst panel
-                    new RowDefinition { Height = GridLength.Star } // İçerik
+                    new RowDefinition { Height = 80 },
+                    new RowDefinition { Height = GridLength.Star }
                 }
             };
 
@@ -169,8 +168,8 @@ namespace Gorevtakipv2
                 },
                 ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = 200 },          // Sol panel
-                    new ColumnDefinition { Width = GridLength.Star } // Sağ taraf
+                    new ColumnDefinition { Width = 200 },
+                    new ColumnDefinition { Width = GridLength.Star }
                 }
             };
 
@@ -181,3 +180,4 @@ namespace Gorevtakipv2
         }
     }
 }
+
