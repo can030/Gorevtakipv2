@@ -10,12 +10,20 @@ using System.Threading.Tasks;
 using SkiaSharp.Views.Maui.Controls;
 using SkiaSharp;
 using Microcharts.Maui;
+using Gorevtakipv2.adminpncr;
 
 namespace Gorevtakipv2
 {
     public class Admin : ContentPage
     {
         sqlbaglanti bgl = new sqlbaglanti();
+
+        // Sınıf seviyesinde alanlar
+        private Grid mainGrid;
+        private StackLayout leftPanel;
+        private Grid topPanel;
+        private ContentView contentArea;
+
         public Admin()
         {
             string adSoyad = Session.AdSoyad;
@@ -37,7 +45,7 @@ namespace Gorevtakipv2
                 Text = $"{adSoyad}",
                 FontSize = 18,
                 FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.White,
+                TextColor = tema.TextColor,
                 HorizontalOptions = LayoutOptions.Center
             };
 
@@ -56,12 +64,13 @@ namespace Gorevtakipv2
             var gecmisButton = CreateMenuButton("📂 Geçmiş");
             var kayitButton = CreateMenuButton("➕ Kayıt İşlemleri");
             var ayarlarButton = CreateMenuButton("⚙️ Ayarlar");
+            
 
-            // Sol panel (sidebar)
-            var leftPanel = new StackLayout
+            // === Sol panel (sidebar) ===
+            leftPanel = new StackLayout
             {
                 Orientation = StackOrientation.Vertical,
-                BackgroundColor = Color.FromArgb("#23233B"),
+                BackgroundColor = tema.CardColor,
                 WidthRequest = 220,
                 Padding = new Thickness(10, 20),
                 Children =
@@ -75,7 +84,8 @@ namespace Gorevtakipv2
                     istatistikButton,
                     gecmisButton,
                     kayitButton,
-                    ayarlarButton
+                    ayarlarButton,
+                    
                 }
             };
 
@@ -95,9 +105,9 @@ namespace Gorevtakipv2
                 }
             };
 
-            var topPanel = new Grid
+            topPanel = new Grid
             {
-                BackgroundColor = Color.FromArgb("#1E1E2F"),
+                BackgroundColor = tema.CardColor,
                 HeightRequest = 70,
                 Padding = new Thickness(10),
                 ColumnDefinitions =
@@ -114,19 +124,17 @@ namespace Gorevtakipv2
             topPanel.Add(cikisButton, 3, 0);
 
             // === İçerik alanı ===
-            var contentLabel = new Label
+            contentArea = new ContentView
             {
-                Text = "Admin Paneline Hoşgeldiniz! 🎉",
-                FontSize = 26,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.White,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center
-            };
-
-            var contentArea = new ContentView
-            {
-                Content = contentLabel,
+                Content = new Label
+                {
+                    Text = "Admin Paneline Hoşgeldiniz! 🎉",
+                    FontSize = 26,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = tema.TextColor,
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center
+                }
             };
 
             // Menü butonlarına tıklama -> içerik değiştir
@@ -145,49 +153,44 @@ namespace Gorevtakipv2
             istatistikButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(istatistikButton);
+
+                var gorevlerListesi = new ObservableCollection<GorevModel>();
+
+                using (var conn = new sqlbaglanti().Connection())
                 {
-                    await AnimateButton(istatistikButton);
-
-                    // Veritabanından veya başka bir listeden görevleri al
-                    var gorevlerListesi = new ObservableCollection<GorevModel>();
-
-                    using (var conn = new sqlbaglanti().Connection())
-                    {
-                        await conn.OpenAsync();
-                        string sql = @"SELECT g.baslik, g.aciklama, g.onemlilik, 
+                    await conn.OpenAsync();
+                    string sql = @"SELECT g.baslik, g.aciklama, g.onemlilik, 
                               p.ad as calisan, g.baslangic_zamani, g.bitis_zamani 
                        FROM gorevler g 
                        JOIN personel_bilgi p ON g.calisan_id = p.id 
                        ORDER BY g.id DESC";
 
-                        using (var cmd = new MySqlCommand(sql, conn))
-                        using (var reader = await cmd.ExecuteReaderAsync())
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
                         {
-                            while (await reader.ReadAsync())
-                            {
-                                string onem = reader["onemlilik"].ToString();
-                                Color renk = Colors.LightGray;
-                                if (onem == "Yüksek") renk = Colors.OrangeRed;
-                                else if (onem == "Orta") renk = Colors.Gold;
-                                else if (onem == "Düşük") renk = Colors.LightGreen;
+                            string onem = reader["onemlilik"].ToString();
+                            Color renk = Colors.LightGray;
+                            if (onem == "Yüksek") renk = Colors.OrangeRed;
+                            else if (onem == "Orta") renk = Colors.Gold;
+                            else if (onem == "Düşük") renk = Colors.LightGreen;
 
-                                gorevlerListesi.Add(new GorevModel
-                                {
-                                    Baslik = reader["baslik"].ToString(),
-                                    Calisan = reader["calisan"].ToString(),
-                                    Zaman = $"{Convert.ToDateTime(reader["baslangic_zamani"]):dd.MM.yyyy HH:mm} - {Convert.ToDateTime(reader["bitis_zamani"]):dd.MM.yyyy HH:mm}",
-                                    Onemlilik = onem,
-                                    OnemlilikRenk = renk,
-                                    Aciklama = reader["aciklama"].ToString(),
-                                    BitisZamani = Convert.ToDateTime(reader["bitis_zamani"])
-                                });
-                            }
+                            gorevlerListesi.Add(new GorevModel
+                            {
+                                Baslik = reader["baslik"].ToString(),
+                                Calisan = reader["calisan"].ToString(),
+                                Zaman = $"{Convert.ToDateTime(reader["baslangic_zamani"]):dd.MM.yyyy HH:mm} - {Convert.ToDateTime(reader["bitis_zamani"]):dd.MM.yyyy HH:mm}",
+                                Onemlilik = onem,
+                                OnemlilikRenk = renk,
+                                Aciklama = reader["aciklama"].ToString(),
+                                BitisZamani = Convert.ToDateTime(reader["bitis_zamani"])
+                            });
                         }
                     }
-
-                    contentArea.Content = new adminpencere.IstatistikSayfasi(gorevlerListesi);
                 }
-                ;
+
+                contentArea.Content = new adminpencere.IstatistikSayfasi(gorevlerListesi);
             };
 
             gecmisButton.Clicked += async (s, e) =>
@@ -205,8 +208,10 @@ namespace Gorevtakipv2
             ayarlarButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(ayarlarButton);
-                contentArea.Content = new Label { Text = "⚙️ Ayarlar Sayfası", FontSize = 30, TextColor = Colors.White, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center };
+                contentArea.Content = new adminpencere.Ayarlar();
             };
+
+           
 
             // Sağ taraf için grid (üst panel + içerik)
             var rightSideGrid = new Grid
@@ -223,9 +228,9 @@ namespace Gorevtakipv2
             Grid.SetRow(contentArea, 1);
 
             // === Ana Grid (sol menü + sağ taraf) ===
-            var mainGrid = new Grid
+            mainGrid = new Grid
             {
-                BackgroundColor = Color.FromArgb("#12121C"),
+                BackgroundColor = tema.BackgroundColor,
                 RowDefinitions =
                 {
                     new RowDefinition { Height = GridLength.Star }
@@ -252,17 +257,48 @@ namespace Gorevtakipv2
                 HeightRequest = 55,
                 Margin = new Thickness(5, 8),
                 FontSize = 16,
-                BackgroundColor = Color.FromArgb("#343454"),
-                TextColor = Colors.White,
+                BackgroundColor = tema.CardColor,
+                TextColor = tema.TextColor,
                 CornerRadius = 12
             };
         }
 
-        // Buton animasyonu (tıklanınca büyüyüp geri küçülüyor)
+        // Buton animasyonu
         private async Task AnimateButton(Button button)
         {
             await button.ScaleTo(1.1, 100, Easing.CubicOut);
             await button.ScaleTo(1.0, 100, Easing.CubicIn);
         }
+
+        // Tema yenileme
+        public void RefreshTheme()
+        {
+            mainGrid.BackgroundColor = tema.BackgroundColor;
+            leftPanel.BackgroundColor = tema.CardColor;
+            topPanel.BackgroundColor = tema.CardColor;
+            contentArea.BackgroundColor = tema.BackgroundColor;
+
+            foreach (var child in leftPanel.Children)
+            {
+                if (child is Label lbl) lbl.TextColor = tema.TextColor;
+                if (child is Button btn)
+                {
+                    btn.BackgroundColor = tema.CardColor;
+                    btn.TextColor = tema.TextColor;
+                }
+            }
+
+            foreach (var child in topPanel.Children)
+            {
+                if (child is Button btn) btn.TextColor = tema.TextColor;
+            }
+
+            if (contentArea.Content is Label lblContent)
+                lblContent.TextColor = tema.TextColor;
+
+            if (contentArea.Content is ContentView cv)
+                cv.BackgroundColor = tema.BackgroundColor;
+        }
+
     }
 }
