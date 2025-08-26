@@ -23,20 +23,24 @@ namespace Gorevtakipv2.adminpencere
 
         public gorevpncr()
         {
+            // === Tema renkleri ===
             Color bgDark = Color.FromArgb("#1C1B29");   // koyu arka plan
             Color cardBg = Color.FromArgb("#2A2937");  // kart rengi
             Color textColor = Colors.WhiteSmoke;       // yazı rengi
             Color accent = Color.FromArgb("#0078D7");  // buton rengi
+            Color border = Color.FromArgb("#444455");
 
+            // === Görev başlığı ===
             baslikEntry = new Entry
             {
-                Placeholder = "Görev Başlığı",
+                Placeholder = "📝 Görev Başlığı",
                 BackgroundColor = Colors.Transparent,
                 TextColor = textColor,
-                PlaceholderColor = Colors.Gray
+                PlaceholderColor = Colors.Gray,
+                FontSize = 16
             };
 
-            // Başlangıç Tarihi + Saati
+            // === Başlangıç Tarih + Saat ===
             baslangicTarihiPicker = new DatePicker
             {
                 Format = "dd.MM.yyyy",
@@ -54,38 +58,19 @@ namespace Gorevtakipv2.adminpencere
                 HorizontalOptions = LayoutOptions.FillAndExpand
             };
 
-            var baslangicLayout = new StackLayout
-            {
-                Orientation = StackOrientation.Vertical,
-                Spacing = 8,
-                Children =
+            var baslangicFrame = CreateCard("📅 Başlangıç",
+                new StackLayout
                 {
-                    new Label { Text = "Başlangıç Tarihi", TextColor = Colors.White, FontAttributes = FontAttributes.Bold, FontSize = 16, HorizontalOptions = LayoutOptions.Center },
-                    new StackLayout
+                    Orientation = StackOrientation.Horizontal,
+                    Spacing = 8,
+                    Children =
                     {
-                        Orientation = StackOrientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            new Frame { Content = baslangicTarihiPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = Color.FromArgb("#1E1D2D"), BorderColor = Color.FromArgb("#444455"), HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand },
-                            new Frame { Content = baslangicSaatPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = Color.FromArgb("#1E1D2D"), BorderColor = Color.FromArgb("#444455"), HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand }
-                        }
+                        new Frame { Content = baslangicTarihiPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = bgDark, BorderColor = border, HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand },
+                        new Frame { Content = baslangicSaatPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = bgDark, BorderColor = border, HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand }
                     }
-                }
-            };
+                }, cardBg, border);
 
-            var baslangicFrame = new Frame
-            {
-                Content = baslangicLayout,
-                Padding = new Thickness(12),
-                CornerRadius = 12,
-                BackgroundColor = cardBg,
-                BorderColor = Color.FromArgb("#333344"),
-                HasShadow = true,
-                HorizontalOptions = LayoutOptions.FillAndExpand
-            };
-
-            // Bitiş Tarihi + Saati
+            // === Bitiş Tarih + Saat ===
             bitisTarihiPicker = new DatePicker
             {
                 Format = "dd.MM.yyyy",
@@ -103,78 +88,58 @@ namespace Gorevtakipv2.adminpencere
                 HorizontalOptions = LayoutOptions.FillAndExpand
             };
 
-            var bitisLayout = new StackLayout
-            {
-                Orientation = StackOrientation.Vertical,
-                Spacing = 8,
-                Children =
+            var bitisFrame = CreateCard("⏰ Bitiş",
+                new StackLayout
                 {
-                    new Label { Text = "Bitiş Tarihi ", TextColor = Colors.White, FontAttributes = FontAttributes.Bold, FontSize = 16, HorizontalOptions = LayoutOptions.Center },
-                    new StackLayout
+                    Orientation = StackOrientation.Horizontal,
+                    Spacing = 8,
+                    Children =
                     {
-                        Orientation = StackOrientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            new Frame { Content = bitisTarihiPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = Color.FromArgb("#1E1D2D"), BorderColor = Color.FromArgb("#444455"), HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand },
-                            new Frame { Content = bitisSaatPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = Color.FromArgb("#1E1D2D"), BorderColor = Color.FromArgb("#444455"), HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand }
-                        }
+                        new Frame { Content = bitisTarihiPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = bgDark, BorderColor = border, HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand },
+                        new Frame { Content = bitisSaatPicker, Padding = new Thickness(5), CornerRadius = 8, BackgroundColor = bgDark, BorderColor = border, HasShadow = false, HorizontalOptions = LayoutOptions.FillAndExpand }
                     }
-                }
-            };
+                }, cardBg, border);
 
-            var bitisFrame = new Frame
-            {
-                Content = bitisLayout,
-                Padding = new Thickness(12),
-                CornerRadius = 12,
-                BackgroundColor = cardBg,
-                BorderColor = Color.FromArgb("#333344"),
-                HasShadow = true,
-                HorizontalOptions = LayoutOptions.FillAndExpand
-            };
-
-            // Başlangıç ve Bitiş yan yana
             var tarihLayout = new StackLayout
             {
                 Orientation = StackOrientation.Horizontal,
                 Spacing = 20,
-                Children =
-                {
-                    baslangicFrame,
-                    bitisFrame
-                }
+                Children = { baslangicFrame, bitisFrame }
             };
 
+            // === Çalışan seçimi ===
             calisanPicker = new Picker
             {
-                Title = "Çalışan Seçimi",
+                Title = "👤 Çalışan Seç",
                 TextColor = textColor,
                 TitleColor = Colors.Gray,
                 BackgroundColor = Colors.Transparent
             };
 
+            // === Sınıf seçimi ===
             var sinifPicker = new Picker
             {
-                Title = "Sınıf Seçimi",
+                Title = "🏷️ Sınıf Seç",
                 ItemsSource = new string[] { "A", "B", "C" },
                 TextColor = textColor,
                 TitleColor = Colors.Gray,
                 BackgroundColor = Colors.Transparent
             };
 
+            // === Önemlilik ===
             onemlilikPicker = new Picker
             {
-                Title = "Önemlilik",
+                Title = "⭐ Önemlilik",
                 ItemsSource = new string[] { "Düşük", "Orta", "Yüksek" },
                 TextColor = textColor,
                 TitleColor = Colors.Gray,
                 BackgroundColor = Colors.Transparent
             };
 
+            // === Açıklama ===
             aciklamaEditor = new Editor
             {
-                Placeholder = "Görev detaylarını yazınız...",
+                Placeholder = "🖊️ Görev detaylarını yazınız...",
                 AutoSize = EditorAutoSizeOption.TextChanges,
                 HeightRequest = 120,
                 BackgroundColor = Colors.Transparent,
@@ -182,53 +147,81 @@ namespace Gorevtakipv2.adminpencere
                 PlaceholderColor = Colors.Gray
             };
 
-            Frame WrapView(View v) => new Frame
-            {
-                Content = v,
-                Padding = new Thickness(10),
-                CornerRadius = 10,
-                BackgroundColor = cardBg,
-                BorderColor = Color.FromArgb("#333344"),
-                HasShadow = false,
-                Margin = new Thickness(0, 8)
-            };
-
+            // === Gönder Butonu ===
             var gonderBtn = new Button
             {
-                Text = "Gönder",
+                Text = "📌 Gönder",
                 BackgroundColor = accent,
                 TextColor = Colors.White,
                 CornerRadius = 12,
-                HeightRequest = 50,
+                HeightRequest = 55,
                 FontAttributes = FontAttributes.Bold,
+                FontSize = 18,
                 Margin = new Thickness(0, 15, 0, 0)
             };
 
-            gonderBtn.Clicked += async (s, e) => await KaydetGorev();
+            gonderBtn.Clicked += async (s, e) =>
+            {
+                await AnimateButton(gonderBtn);
+                await KaydetGorev();
+            };
 
+            // === Layout ===
             Content = new ScrollView
             {
                 BackgroundColor = bgDark,
                 Content = new StackLayout
                 {
                     Padding = 20,
+                    Spacing = 12,
                     Children =
                     {
-                        WrapView(baslikEntry),
-                        tarihLayout,   // Başlangıç ve Bitiş yan yana paneller
-                        WrapView(calisanPicker),
-                        WrapView(sinifPicker),
-                        WrapView(onemlilikPicker),
-                        WrapView(aciklamaEditor),
+                        CreateCard("📝 Başlık", baslikEntry, cardBg, border),
+                        tarihLayout,
+                        CreateCard("👤 Çalışan", calisanPicker, cardBg, border),
+                        CreateCard("🏷️ Sınıf", sinifPicker, cardBg, border),
+                        CreateCard("⭐ Önemlilik", onemlilikPicker, cardBg, border),
+                        CreateCard("📖 Açıklama", aciklamaEditor, cardBg, border),
                         gonderBtn
                     }
                 }
             };
 
-            // Çalışanları veritabanından yükle
+            // Çalışanları DB’den çek
             LoadCalisanlar();
         }
 
+        // === Ortak Kart Component ===
+        private Frame CreateCard(string title, View content, Color bg, Color border)
+        {
+            return new Frame
+            {
+                Content = new StackLayout
+                {
+                    Spacing = 5,
+                    Children =
+                    {
+                        new Label { Text = title, TextColor = Colors.LightGray, FontAttributes = FontAttributes.Bold, FontSize = 14 },
+                        content
+                    }
+                },
+                Padding = new Thickness(12),
+                CornerRadius = 12,
+                BackgroundColor = bg,
+                BorderColor = border,
+                HasShadow = true,
+                HorizontalOptions = LayoutOptions.FillAndExpand
+            };
+        }
+
+        // === Buton animasyonu ===
+        private async Task AnimateButton(Button button)
+        {
+            await button.ScaleTo(1.1, 100, Easing.CubicOut);
+            await button.ScaleTo(1.0, 100, Easing.CubicIn);
+        }
+
+        // === DB'den çalışanları yükle ===
         private async void LoadCalisanlar()
         {
             try
@@ -244,8 +237,6 @@ namespace Gorevtakipv2.adminpencere
                         {
                             int id = reader.GetInt32("id");
                             string ad = reader.GetString("ad");
-
-                            // PickerItem model olarak tutulabilir
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
                                 calisanPicker.Items.Add($"{id}-{ad}");
@@ -263,6 +254,7 @@ namespace Gorevtakipv2.adminpencere
             }
         }
 
+        // === Kaydetme işlemi ===
         private async Task KaydetGorev()
         {
             try
@@ -279,7 +271,6 @@ namespace Gorevtakipv2.adminpencere
                 string aciklama = aciklamaEditor.Text ?? "";
                 string onemlilik = onemlilikPicker.SelectedItem.ToString();
 
-                // Çalışan id’yi picker item’den çekiyoruz ("id-ad" formatında eklemiştik)
                 string calisanSecim = calisanPicker.SelectedItem.ToString();
                 int calisanId = int.Parse(calisanSecim.Split('-')[0]);
 
@@ -300,7 +291,6 @@ namespace Gorevtakipv2.adminpencere
                         cmd.Parameters.AddWithValue("@calisan_id", calisanId);
                         cmd.Parameters.AddWithValue("@baslangic", baslangic);
                         cmd.Parameters.AddWithValue("@bitis", bitis);
-
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }
@@ -315,5 +305,6 @@ namespace Gorevtakipv2.adminpencere
         }
     }
 }
+
 
 

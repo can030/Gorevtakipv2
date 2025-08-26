@@ -12,60 +12,151 @@ namespace Gorevtakipv2.adminpencere
 
         public gecmis()
         {
-            Color bgDark = Color.FromArgb("#1C1B29");
-            Color cardBg = Color.FromArgb("#2A2937");
+            Color bgDark = Color.FromArgb("#12121C");
 
+            // --- CollectionView tanımı ---
             gorevListView = new CollectionView
             {
                 ItemTemplate = new DataTemplate(() =>
                 {
-                    var baslikLbl = new Label { FontSize = 18, FontAttributes = FontAttributes.Bold, TextColor = Colors.White };
+                    var importanceDot = new BoxView
+                    {
+                        WidthRequest = 12,
+                        HeightRequest = 12,
+                        CornerRadius = 6,
+                        VerticalOptions = LayoutOptions.Start,
+                        HorizontalOptions = LayoutOptions.Start,
+                        Margin = new Thickness(0, 4, 6, 0)
+                    };
+                    importanceDot.SetBinding(BoxView.ColorProperty, "OnemlilikRenk");
+
+                    var baslikLbl = new Label
+                    {
+                        FontSize = 20,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.White
+                    };
                     baslikLbl.SetBinding(Label.TextProperty, "Baslik");
 
-                    var calisanLbl = new Label { FontSize = 14, TextColor = Colors.LightGray };
+                    var calisanLbl = new Label { FontSize = 15, TextColor = Colors.LightGray };
                     calisanLbl.SetBinding(Label.TextProperty, "Calisan");
 
-                    var zamanLbl = new Label { FontSize = 14, TextColor = Colors.LightGray };
+                    var zamanLbl = new Label { FontSize = 15, TextColor = Colors.Silver };
                     zamanLbl.SetBinding(Label.TextProperty, "Zaman");
 
-                    var onemlilikLbl = new Label { FontSize = 14, FontAttributes = FontAttributes.Bold };
-                    onemlilikLbl.SetBinding(Label.TextProperty, "Onemlilik");
-                    onemlilikLbl.SetBinding(Label.TextColorProperty, "OnemlilikRenk");
+                    var onemLbl = new Label { FontSize = 16, FontAttributes = FontAttributes.Bold };
+                    onemLbl.SetBinding(Label.TextProperty, "Onemlilik");
+                    onemLbl.SetBinding(Label.TextColorProperty, "OnemlilikRenk");
 
-                    var aciklamaLbl = new Label { FontSize = 13, TextColor = Colors.WhiteSmoke, LineBreakMode = LineBreakMode.TailTruncation };
+                    var infoRow = new StackLayout
+                    {
+                        Orientation = StackOrientation.Horizontal,
+                        Spacing = 18,
+                        Children =
+                        {
+                            new StackLayout
+                            {
+                                Orientation = StackOrientation.Horizontal,
+                                Spacing = 4,
+                                Children = { new Label{Text="👤"}, calisanLbl }
+                            },
+                            new StackLayout
+                            {
+                                Orientation = StackOrientation.Horizontal,
+                                Spacing = 4,
+                                Children = { new Label{Text="⏳"}, zamanLbl }
+                            },
+                            new StackLayout
+                            {
+                                Orientation = StackOrientation.Horizontal,
+                                Spacing = 4,
+                                Children = { new Label{Text="⚡"}, onemLbl }
+                            }
+                        }
+                    };
+
+                    var aciklamaLbl = new Label
+                    {
+                        FontSize = 15,
+                        TextColor = Colors.WhiteSmoke,
+                        LineBreakMode = LineBreakMode.WordWrap,
+                        MaxLines = 3
+                    };
                     aciklamaLbl.SetBinding(Label.TextProperty, "Aciklama");
+
+                    var aciklamaFrame = new Frame
+                    {
+                        Padding = new Thickness(10, 6),
+                        BackgroundColor = Color.FromArgb("#2E2E3E"),
+                        CornerRadius = 10,
+                        HasShadow = false,
+                        Content = aciklamaLbl
+                    };
+
+                    // --- Görev Bitti Uyarısı ---
+                    var bittiLbl = new Label
+                    {
+                        FontSize = 14,
+                        TextColor = Colors.OrangeRed,
+                        FontAttributes = FontAttributes.Bold,
+                        Text = "✔ Görev tamamlandı"
+                    };
+
+                    var contentStack = new StackLayout
+                    {
+                        Spacing = 8,
+                        Children =
+                        {
+                            new StackLayout
+                            {
+                                Orientation = StackOrientation.Horizontal,
+                                Children = { importanceDot, baslikLbl }
+                            },
+                            infoRow,
+                            aciklamaFrame,
+                            bittiLbl
+                        }
+                    };
 
                     return new Frame
                     {
-                        CornerRadius = 12,
-                        BackgroundColor = cardBg,
-                        Margin = new Thickness(10, 5),
+                        CornerRadius = 16,
                         HasShadow = true,
-                        Content = new StackLayout
-                        {
-                            Spacing = 6,
-                            Children = { baslikLbl, calisanLbl, zamanLbl, onemlilikLbl, aciklamaLbl }
-                        }
+                        Padding = new Thickness(14),
+                        Margin = new Thickness(14, 10),
+                        BackgroundColor = Color.FromArgb("#1E1E2E"),
+                        BorderColor = Color.FromArgb("#3A3A55"),
+                        Content = contentStack
                     };
                 })
             };
 
-            Content = new StackLayout
+            // --- Ana Grid: başlık + liste ---
+            var mainGrid = new Grid
             {
-                BackgroundColor = bgDark,
-                Children =
+                RowDefinitions =
                 {
-                    new Label
-                    {
-                        Text = "📜 Geçmiş Görevler",
-                        FontSize = 22,
-                        TextColor = Colors.White,
-                        FontAttributes = FontAttributes.Bold,
-                        Margin = new Thickness(15,10,10,5)
-                    },
-                    gorevListView
-                }
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = GridLength.Star }
+                },
+                BackgroundColor = bgDark
             };
+
+            var lblTitle = new Label
+            {
+                Text = "📜 Geçmiş Görevler",
+                FontSize = 24,
+                TextColor = Color.FromArgb("#FFBF00"),
+                FontAttributes = FontAttributes.Bold,
+                Margin = new Thickness(20, 15, 10, 10)
+            };
+            Grid.SetRow(lblTitle, 0);
+            Grid.SetRow(gorevListView, 1);
+
+            mainGrid.Children.Add(lblTitle);
+            mainGrid.Children.Add(gorevListView);
+
+            Content = mainGrid;
 
             LoadGorevler();
         }
@@ -99,11 +190,12 @@ namespace Gorevtakipv2.adminpencere
                             liste.Add(new GorevModel
                             {
                                 Baslik = reader["baslik"].ToString(),
-                                Calisan = "👤 " + reader["calisan"].ToString(),
-                                Zaman = $"⏳ {Convert.ToDateTime(reader["baslangic_zamani"]):dd.MM.yyyy HH:mm} - {Convert.ToDateTime(reader["bitis_zamani"]):dd.MM.yyyy HH:mm}",
-                                Onemlilik = "⚡ " + onem,
+                                Calisan = reader["calisan"].ToString(),
+                                Zaman = $"{Convert.ToDateTime(reader["baslangic_zamani"]):dd.MM.yyyy HH:mm} - {Convert.ToDateTime(reader["bitis_zamani"]):dd.MM.yyyy HH:mm}",
+                                Onemlilik = onem,
                                 OnemlilikRenk = renk,
-                                Aciklama = reader["aciklama"].ToString()
+                                Aciklama = reader["aciklama"].ToString(),
+                                BitisZamani = Convert.ToDateTime(reader["bitis_zamani"])
                             });
                         }
                     }
@@ -117,5 +209,4 @@ namespace Gorevtakipv2.adminpencere
             }
         }
     }
-
 }
