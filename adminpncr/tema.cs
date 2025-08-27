@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Maui.Graphics.Text;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,22 +9,51 @@ namespace Gorevtakipv2.adminpncr
 {
     public static class tema
     {
-        public static Color BackgroundColor { get; set; } = Color.FromArgb("#12121C");
-        public static Color CardColor { get; set; } = Color.FromArgb("#1E1E2E");
-        public static Color TextColor { get; set; } = Colors.White;
+        public static Color BackgroundColor { get; private set; }
+        public static Color TextColor { get; private set; }
+        public static Color CardColor { get; private set; }
+        public static Color EntryBackground { get; private set; }
+        public static Color ButtonColor { get; private set; }
+        public static Color AccentColor { get; private set; }
+        public static Color SecondaryText { get; private set; }
+        public static Color SuccessColor { get; private set; }
+        public static Color WarningColor { get; private set; }
+        public static Color DangerColor { get; private set; }
+        public static Color PlaceholderColor { get; private set; }
+        public static bool IsDark { get; private set; }
 
-        public static void beyaztema()
+        public static void garatema() // Açık tema
         {
-            BackgroundColor = Colors.White;
-            CardColor = Color.FromArgb("#F0F0F0");
-            TextColor = Colors.Black;
+
+            BackgroundColor = Color.FromArgb("#F9FAFB"); // Hafif gri beyaz
+            PlaceholderColor = Color.FromArgb("#F9FAFB");
+            CardColor = Colors.White;
+            EntryBackground = Color.FromArgb("#F3F4F6"); // Gözükür ama çok kontrast değil
+            TextColor = Color.FromArgb("#111827"); // Koyu yazı
+            SecondaryText = Color.FromArgb("#6B7280");
+            ButtonColor = Color.FromArgb("#E5E7EB");
+            AccentColor = Color.FromArgb("#2563EB");
+            SuccessColor = Color.FromArgb("#22C55E");
+            WarningColor = Color.FromArgb("#F59E0B");
+            DangerColor = Color.FromArgb("#DC2626");
+            IsDark = false;
         }
 
-        public static void garatema()
+        public static void beyaztema() // Koyu tema
         {
+
             BackgroundColor = Color.FromArgb("#12121C");
-            CardColor = Color.FromArgb("#1E1E2E");
+            PlaceholderColor = Color.FromArgb("#12121C");
+            CardColor = Color.FromArgb("#1E1E2C");
+            EntryBackground = Color.FromArgb("#2A2A3C");
             TextColor = Colors.White;
+            SecondaryText = Color.FromArgb("#A1A1B5");
+            ButtonColor = Color.FromArgb("#3A3A55");
+            AccentColor = Color.FromArgb("#4E9FFF");
+            SuccessColor = Color.FromArgb("#4CAF50");
+            WarningColor = Color.FromArgb("#FFC107");
+            DangerColor = Color.FromArgb("#F44336");
+            IsDark = true;
         }
     }
 }

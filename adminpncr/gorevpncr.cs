@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls;
+﻿using Gorevtakipv2.adminpncr;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using MySql.Data.MySqlClient;
 using System;
@@ -24,20 +25,22 @@ namespace Gorevtakipv2.adminpencere
         public gorevpncr()
         {
             // === Tema renkleri ===
-            Color bgDark = Color.FromArgb("#1C1B29");   // koyu arka plan
-            Color cardBg = Color.FromArgb("#2A2937");  // kart rengi
-            Color textColor = Colors.WhiteSmoke;       // yazı rengi
-            Color accent = Color.FromArgb("#0078D7");  // buton rengi
-            Color border = Color.FromArgb("#444455");
+            Color bgDark = tema.BackgroundColor;
+            Color cardBg = tema.CardColor;
+            Color textColor = tema.TextColor;
+            Color accent = tema.AccentColor;
+            Color border = tema.ButtonColor;
 
             // === Görev başlığı ===
             baslikEntry = new Entry
             {
                 Placeholder = "📝 Görev Başlığı",
-                BackgroundColor = Colors.Transparent,
-                TextColor = textColor,
-                PlaceholderColor = Colors.Gray,
+
+                BackgroundColor = tema.EntryBackground,
+                TextColor = tema.TextColor,
+                PlaceholderColor = tema.TextColor,
                 FontSize = 16
+                
             };
 
             // === Başlangıç Tarih + Saat ===
@@ -111,9 +114,10 @@ namespace Gorevtakipv2.adminpencere
             calisanPicker = new Picker
             {
                 Title = "👤 Çalışan Seç",
-                TextColor = textColor,
-                TitleColor = Colors.Gray,
-                BackgroundColor = Colors.Transparent
+                
+                TextColor = tema.TextColor,
+                TitleColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
             };
 
             // === Sınıf seçimi ===
@@ -121,9 +125,9 @@ namespace Gorevtakipv2.adminpencere
             {
                 Title = "🏷️ Sınıf Seç",
                 ItemsSource = new string[] { "A", "B", "C" },
-                TextColor = textColor,
-                TitleColor = Colors.Gray,
-                BackgroundColor = Colors.Transparent
+                TextColor = tema.TextColor,
+                TitleColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
             };
 
             // === Önemlilik ===
@@ -131,9 +135,9 @@ namespace Gorevtakipv2.adminpencere
             {
                 Title = "⭐ Önemlilik",
                 ItemsSource = new string[] { "Düşük", "Orta", "Yüksek" },
-                TextColor = textColor,
-                TitleColor = Colors.Gray,
-                BackgroundColor = Colors.Transparent
+                TextColor = tema.TextColor,
+                TitleColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
             };
 
             // === Açıklama ===
@@ -142,16 +146,16 @@ namespace Gorevtakipv2.adminpencere
                 Placeholder = "🖊️ Görev detaylarını yazınız...",
                 AutoSize = EditorAutoSizeOption.TextChanges,
                 HeightRequest = 120,
-                BackgroundColor = Colors.Transparent,
-                TextColor = textColor,
-                PlaceholderColor = Colors.Gray
+                BackgroundColor = tema.EntryBackground,
+                TextColor = tema.TextColor,
+                PlaceholderColor = tema.TextColor
             };
 
             // === Gönder Butonu ===
             var gonderBtn = new Button
             {
                 Text = "📌 Gönder",
-                BackgroundColor = accent,
+                BackgroundColor = tema.SuccessColor,
                 TextColor = Colors.White,
                 CornerRadius = 12,
                 HeightRequest = 55,
@@ -187,11 +191,9 @@ namespace Gorevtakipv2.adminpencere
                 }
             };
 
-            // Çalışanları DB’den çek
             LoadCalisanlar();
         }
 
-        // === Ortak Kart Component ===
         private Frame CreateCard(string title, View content, Color bg, Color border)
         {
             return new Frame
@@ -201,7 +203,7 @@ namespace Gorevtakipv2.adminpencere
                     Spacing = 5,
                     Children =
                     {
-                        new Label { Text = title, TextColor = Colors.LightGray, FontAttributes = FontAttributes.Bold, FontSize = 14 },
+                        new Label { Text = title, TextColor = tema.SecondaryText, FontAttributes = FontAttributes.Bold, FontSize = 14 },
                         content
                     }
                 },
@@ -214,14 +216,12 @@ namespace Gorevtakipv2.adminpencere
             };
         }
 
-        // === Buton animasyonu ===
         private async Task AnimateButton(Button button)
         {
             await button.ScaleTo(1.1, 100, Easing.CubicOut);
             await button.ScaleTo(1.0, 100, Easing.CubicIn);
         }
 
-        // === DB'den çalışanları yükle ===
         private async void LoadCalisanlar()
         {
             try
@@ -254,7 +254,6 @@ namespace Gorevtakipv2.adminpencere
             }
         }
 
-        // === Kaydetme işlemi ===
         private async Task KaydetGorev()
         {
             try

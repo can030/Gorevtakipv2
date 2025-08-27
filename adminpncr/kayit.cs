@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls;
+﻿using Gorevtakipv2.adminpncr;
+using Microsoft.Maui.Controls;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -20,23 +21,35 @@ namespace Gorevtakipv2.adminpencere
         private Button silBtn;
 
         private sqlbaglanti bgl = new sqlbaglanti();
-
-        // ID tabanlı kullanıcı listesi
         private ObservableCollection<Kullanici> mevcutKullanicilar = new ObservableCollection<Kullanici>();
 
         public Kayit()
         {
-            BackgroundColor = Color.FromArgb("#12121C");
+            BackgroundColor = tema.BackgroundColor;
 
             // --- Kayıt girişleri ---
-            isimEntry = new Entry { Placeholder = "İsim", TextColor = Colors.White };
-            soyadEntry = new Entry { Placeholder = "Soyad", TextColor = Colors.White };
+            isimEntry = new Entry
+            {
+                Placeholder = "İsim",
+                PlaceholderColor = tema.TextColor,
+                TextColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
+            };
+
+            soyadEntry = new Entry
+            {
+                Placeholder = "Soyad",
+                PlaceholderColor = tema.TextColor,
+                TextColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
+            };
 
             yetkiPicker = new Picker
             {
                 Title = "Yetki Seçin",
-                TextColor = Colors.White,
-                BackgroundColor = Color.FromArgb("#1E1E2E")
+                TitleColor = tema.TextColor,
+                TextColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground
             };
             yetkiPicker.Items.Add("Kullanıcı");
             yetkiPicker.Items.Add("Admin");
@@ -45,37 +58,47 @@ namespace Gorevtakipv2.adminpencere
             kaydetBtn = new Button
             {
                 Text = "Üye Kaydet",
-                BackgroundColor = Color.FromArgb("#28a745"),
+                BackgroundColor = tema.SuccessColor,
                 TextColor = Colors.White,
-                CornerRadius = 12
+                CornerRadius = 12,
+                BorderColor = tema.IsDark ? Colors.White : Color.FromArgb("#D1D5DB"),
+                BorderWidth = 1,
+                Shadow = tema.IsDark ? null : new Shadow
+                {
+                    Brush = Brush.Black,
+                    Opacity = 0.05f,
+                    Radius = 4,
+                    Offset = new Point(2, 2)
+                }
             };
             kaydetBtn.Clicked += KaydetBtn_Clicked;
 
-            // --- Mevcut kullanıcıları gösteren Picker ---
             silPicker = new Picker
             {
                 Title = "Silmek için kullanıcı seçin",
-                TextColor = Colors.White,
-                BackgroundColor = Color.FromArgb("#1E1E2E"),
+                TitleColor = tema.TextColor,
+                TextColor = tema.TextColor,
+                BackgroundColor = tema.EntryBackground,
                 ItemsSource = mevcutKullanicilar,
-                ItemDisplayBinding = new Binding("AdSoyad") // Picker'da gösterilecek isim
+                ItemDisplayBinding = new Binding("AdSoyad"),
+                
             };
 
             silBtn = new Button
             {
                 Text = "Üye Sil",
-                BackgroundColor = Color.FromArgb("#dc3545"),
+                BackgroundColor = tema.DangerColor,
                 TextColor = Colors.White,
                 CornerRadius = 12
             };
             silBtn.Clicked += SilBtn_Clicked;
 
-            // --- Card tasarım ---
+            // --- Card ---
             var card = new Frame
             {
                 CornerRadius = 16,
                 Padding = 20,
-                BackgroundColor = Color.FromArgb("#1E1E2E"),
+                BackgroundColor = tema.CardColor,
                 HasShadow = true,
                 Content = new StackLayout
                 {
@@ -86,15 +109,19 @@ namespace Gorevtakipv2.adminpencere
                         {
                             Text = "Üye Kayıt / Sil",
                             FontSize = 24,
-                            TextColor = Colors.White,
+                            TextColor = tema.TextColor,
                             FontAttributes = FontAttributes.Bold
                         },
                         isimEntry,
                         soyadEntry,
                         yetkiPicker,
                         kaydetBtn,
-                        new BoxView { HeightRequest = 2, Color = Color.FromArgb("#2E2E3E") },
-                        new Label { Text="Mevcut Kullanıcılar", FontSize=18, TextColor=Colors.White },
+                        new BoxView { HeightRequest = 2, Color = tema.SecondaryText },
+                        new Label 
+                        { 
+                            Text="Mevcut Kullanıcılar",
+                            FontSize=18, 
+                            TextColor=tema.TextColor },
                         silPicker,
                         silBtn
                     }
@@ -110,11 +137,9 @@ namespace Gorevtakipv2.adminpencere
                 }
             };
 
-            // Mevcut kullanıcıları yükle
             LoadKullanicilar();
         }
 
-        // Kullanıcı sınıfı
         public class Kullanici
         {
             public int Id { get; set; }
@@ -134,12 +159,11 @@ namespace Gorevtakipv2.adminpencere
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    var k = new Kullanici
+                    mevcutKullanicilar.Add(new Kullanici
                     {
                         Id = Convert.ToInt32(reader["id"]),
                         AdSoyad = $"{reader["ad"]} {reader["soyad"]}"
-                    };
-                    mevcutKullanicilar.Add(k);
+                    });
                 }
             }
             catch (Exception ex)
@@ -179,7 +203,6 @@ namespace Gorevtakipv2.adminpencere
                 soyadEntry.Text = "";
                 yetkiPicker.SelectedIndex = 0;
 
-                // Listeyi güncelle
                 LoadKullanicilar();
             }
             catch (Exception ex)
@@ -190,6 +213,7 @@ namespace Gorevtakipv2.adminpencere
 
         private async void SilBtn_Clicked(object sender, EventArgs e)
         {
+            
             var secilenKullanici = silPicker.SelectedItem as Kullanici;
             if (secilenKullanici == null)
             {
@@ -213,7 +237,6 @@ namespace Gorevtakipv2.adminpencere
                 else
                     await DisplayAlert("Bilgi", "Bu kullanıcı bulunamadı.", "Tamam");
 
-                // Listeyi güncelle
                 LoadKullanicilar();
             }
             catch (Exception ex)

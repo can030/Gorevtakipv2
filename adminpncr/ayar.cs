@@ -1,4 +1,5 @@
 ﻿using Gorevtakipv2.adminpncr;
+using Microsoft.Maui.Graphics.Text;
 using MySql.Data.MySqlClient;
 using System;
 using System.Threading.Tasks;
@@ -10,46 +11,56 @@ namespace Gorevtakipv2.adminpencere
         private Picker temaPicker;
         private Switch bildirimSwitch;
         private Button parolaBtn;
-        private Frame card; // kartı sınıf düzeyine taşıyoruz
-        private StackLayout cardStack; // içindeki içerik
+        private Frame card;
+        private StackLayout cardStack;
 
         public Ayarlar()
         {
             BackgroundColor = tema.BackgroundColor;
 
-            // Tema Seçimi
+            // --- Tema Seçimi ---
             temaPicker = new Picker
             {
-                Title = "Tema Seçimi",
+                
                 TextColor = tema.TextColor,
-                BackgroundColor = tema.CardColor
+                BackgroundColor = tema.EntryBackground
             };
-            
             temaPicker.Items.Add("Açık");
+            {
+                temaPicker.TextColor = tema.TextColor;
+            }
             temaPicker.Items.Add("Koyu");
-            temaPicker.SelectedIndex = 0;
-
+            temaPicker.SelectedIndex = tema.IsDark ? 1 : 0;
             temaPicker.SelectedIndexChanged += TemaPicker_SelectedIndexChanged;
 
-            // Bildirim
+            // --- Bildirim Switch ---
             bildirimSwitch = new Switch
             {
                 IsToggled = true,
-                OnColor = Colors.White,
-                ThumbColor = Colors.Gray
+                OnColor = tema.AccentColor,
+                ThumbColor = tema.IsDark ? Colors.White : Colors.Gray
             };
 
-            // Parola değiştir
+            // --- Parola Butonu ---
             parolaBtn = new Button
             {
                 Text = "Parola Değiştir",
-                BackgroundColor = tema.CardColor,
+                BackgroundColor = tema.ButtonColor,
                 TextColor = tema.TextColor,
-                CornerRadius = 12
+                CornerRadius = 12,
+                BorderColor = tema.IsDark ? Colors.White : Color.FromArgb("#D1D5DB"),
+                BorderWidth = 1,
+                Shadow = new Shadow
+                {
+                    Brush = Brush.Black,
+                    Opacity = tema.IsDark ? 0 : 0.05f,
+                    Radius = 4,
+                    Offset = new Point(2, 2)
+                }
             };
             parolaBtn.Clicked += ParolaBtn_Clicked;
 
-            // Kart tasarımı
+            // --- Kart ---
             cardStack = new StackLayout
             {
                 Spacing = 20,
@@ -69,14 +80,6 @@ namespace Gorevtakipv2.adminpencere
                         {
                             new Label{ Text="Tema Seçimi", TextColor=tema.TextColor },
                             temaPicker
-                        }
-                    },
-                    new StackLayout
-                    {
-                        Spacing = 8,
-                        Children =
-                        {
-                            new Label{ Text="Dil Seçimi (Geliştirilmekte)", TextColor=tema.TextColor }
                         }
                     },
                     new StackLayout
@@ -117,46 +120,50 @@ namespace Gorevtakipv2.adminpencere
         {
             switch (temaPicker.SelectedItem?.ToString())
             {
-                case "Sistem":
                 case "Açık":
-                    tema.beyaztema();
+                    tema.garatema();
                     break;
                 case "Koyu":
-                    tema.garatema();
+                    tema.beyaztema();
                     break;
             }
 
-            // Admin ana sayfayı güncelle
+            // Ana sayfayı güncelle
             (Application.Current.MainPage as Admin)?.RefreshTheme();
 
-            // Ayarlar sayfasındaki anlık değişiklik
+            // Ayarlar sayfasını anlık güncelle
             BackgroundColor = tema.BackgroundColor;
             card.BackgroundColor = tema.CardColor;
-            temaPicker.BackgroundColor = tema.CardColor;
+            temaPicker.BackgroundColor = tema.EntryBackground;
+
+            parolaBtn.BackgroundColor = tema.ButtonColor;
+            parolaBtn.TextColor = tema.TextColor;
+            parolaBtn.BorderColor = tema.IsDark ? Colors.White : Color.FromArgb("#D1D5DB");
+            parolaBtn.Shadow = tema.IsDark ? null : new Shadow
+            {
+                Brush = Brush.Black,
+                Opacity = 0.05f,
+                Radius = 4,
+                Offset = new Point(2, 2)
+            };
 
             foreach (var child in cardStack.Children)
             {
-                if (child is Label lbl)
-                    lbl.TextColor = tema.TextColor;
-
+                if (child is Label lbl) lbl.TextColor = tema.TextColor;
                 if (child is StackLayout sl)
                 {
                     foreach (var inner in sl.Children)
                     {
-                        if (inner is Label l)
-                            l.TextColor = tema.TextColor;
+                        if (inner is Label l) l.TextColor = tema.TextColor;
                         else if (inner is Button b)
                         {
-                            b.BackgroundColor = tema.CardColor;
+                            b.BackgroundColor = tema.ButtonColor;
                             b.TextColor = tema.TextColor;
+                            b.BorderColor = tema.IsDark ? Colors.White : Color.FromArgb("#D1D5DB");
                         }
                     }
                 }
             }
-
-            // Buton rengini ayrıca ayarla
-            parolaBtn.BackgroundColor = tema.CardColor;
-            parolaBtn.TextColor = tema.TextColor;
         }
 
         private async void ParolaBtn_Clicked(object sender, EventArgs e)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using Microsoft.Maui.Controls;
+using Gorevtakipv2.adminpncr;
 
 namespace Gorevtakipv2.adminpencere
 {
@@ -12,8 +13,6 @@ namespace Gorevtakipv2.adminpencere
 
         public gecmis()
         {
-            Color bgDark = Color.FromArgb("#12121C");
-
             // --- CollectionView tanımı ---
             gorevListView = new CollectionView
             {
@@ -34,17 +33,29 @@ namespace Gorevtakipv2.adminpencere
                     {
                         FontSize = 20,
                         FontAttributes = FontAttributes.Bold,
-                        TextColor = Colors.White
+                        TextColor = tema.TextColor
                     };
                     baslikLbl.SetBinding(Label.TextProperty, "Baslik");
 
-                    var calisanLbl = new Label { FontSize = 15, TextColor = Colors.LightGray };
+                    var calisanLbl = new Label
+                    {
+                        FontSize = 15,
+                        TextColor = tema.SecondaryText
+                    };
                     calisanLbl.SetBinding(Label.TextProperty, "Calisan");
 
-                    var zamanLbl = new Label { FontSize = 15, TextColor = Colors.Silver };
+                    var zamanLbl = new Label
+                    {
+                        FontSize = 15,
+                        TextColor = tema.SecondaryText
+                    };
                     zamanLbl.SetBinding(Label.TextProperty, "Zaman");
 
-                    var onemLbl = new Label { FontSize = 16, FontAttributes = FontAttributes.Bold };
+                    var onemLbl = new Label
+                    {
+                        FontSize = 16,
+                        FontAttributes = FontAttributes.Bold
+                    };
                     onemLbl.SetBinding(Label.TextProperty, "Onemlilik");
                     onemLbl.SetBinding(Label.TextColorProperty, "OnemlilikRenk");
 
@@ -58,19 +69,19 @@ namespace Gorevtakipv2.adminpencere
                             {
                                 Orientation = StackOrientation.Horizontal,
                                 Spacing = 4,
-                                Children = { new Label{Text="👤"}, calisanLbl }
+                                Children = { new Label{Text="👤", TextColor = tema.TextColor}, calisanLbl }
                             },
                             new StackLayout
                             {
                                 Orientation = StackOrientation.Horizontal,
                                 Spacing = 4,
-                                Children = { new Label{Text="⏳"}, zamanLbl }
+                                Children = { new Label{Text="⏳", TextColor = tema.TextColor}, zamanLbl }
                             },
                             new StackLayout
                             {
                                 Orientation = StackOrientation.Horizontal,
                                 Spacing = 4,
-                                Children = { new Label{Text="⚡"}, onemLbl }
+                                Children = { new Label{Text="⚡", TextColor = tema.TextColor}, onemLbl }
                             }
                         }
                     };
@@ -78,7 +89,7 @@ namespace Gorevtakipv2.adminpencere
                     var aciklamaLbl = new Label
                     {
                         FontSize = 15,
-                        TextColor = Colors.WhiteSmoke,
+                        TextColor = tema.SecondaryText,
                         LineBreakMode = LineBreakMode.WordWrap,
                         MaxLines = 3
                     };
@@ -87,17 +98,16 @@ namespace Gorevtakipv2.adminpencere
                     var aciklamaFrame = new Frame
                     {
                         Padding = new Thickness(10, 6),
-                        BackgroundColor = Color.FromArgb("#2E2E3E"),
+                        BackgroundColor = tema.CardColor,
                         CornerRadius = 10,
                         HasShadow = false,
                         Content = aciklamaLbl
                     };
 
-                    // --- Görev Bitti Uyarısı ---
                     var bittiLbl = new Label
                     {
                         FontSize = 14,
-                        TextColor = Colors.OrangeRed,
+                        TextColor = tema.SuccessColor,
                         FontAttributes = FontAttributes.Bold,
                         Text = "✔ Görev tamamlandı"
                     };
@@ -124,14 +134,13 @@ namespace Gorevtakipv2.adminpencere
                         HasShadow = true,
                         Padding = new Thickness(14),
                         Margin = new Thickness(14, 10),
-                        BackgroundColor = Color.FromArgb("#1E1E2E"),
-                        BorderColor = Color.FromArgb("#3A3A55"),
+                        BackgroundColor = tema.CardColor,
+                        BorderColor = tema.ButtonColor,
                         Content = contentStack
                     };
                 })
             };
 
-            // --- Ana Grid: başlık + liste ---
             var mainGrid = new Grid
             {
                 RowDefinitions =
@@ -139,17 +148,18 @@ namespace Gorevtakipv2.adminpencere
                     new RowDefinition { Height = GridLength.Auto },
                     new RowDefinition { Height = GridLength.Star }
                 },
-                BackgroundColor = bgDark
+                BackgroundColor = tema.BackgroundColor
             };
 
             var lblTitle = new Label
             {
                 Text = "📜 Geçmiş Görevler",
                 FontSize = 24,
-                TextColor = Color.FromArgb("#FFBF00"),
+                TextColor = tema.AccentColor,
                 FontAttributes = FontAttributes.Bold,
                 Margin = new Thickness(20, 15, 10, 10)
             };
+
             Grid.SetRow(lblTitle, 0);
             Grid.SetRow(gorevListView, 1);
 
@@ -183,9 +193,9 @@ namespace Gorevtakipv2.adminpencere
                         {
                             string onem = reader["onemlilik"].ToString();
                             Color renk = Colors.LightGray;
-                            if (onem == "Yüksek") renk = Colors.OrangeRed;
-                            else if (onem == "Orta") renk = Colors.Gold;
-                            else if (onem == "Düşük") renk = Colors.LightGreen;
+                            if (onem == "Yüksek") renk = tema.DangerColor;
+                            else if (onem == "Orta") renk = tema.WarningColor;
+                            else if (onem == "Düşük") renk = tema.SuccessColor;
 
                             liste.Add(new GorevModel
                             {

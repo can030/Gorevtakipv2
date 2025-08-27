@@ -18,7 +18,6 @@ namespace Gorevtakipv2
     {
         sqlbaglanti bgl = new sqlbaglanti();
 
-        // Sınıf seviyesinde alanlar
         private Grid mainGrid;
         private StackLayout leftPanel;
         private Grid topPanel;
@@ -64,7 +63,6 @@ namespace Gorevtakipv2
             var gecmisButton = CreateMenuButton("📂 Geçmiş");
             var kayitButton = CreateMenuButton("➕ Kayıt İşlemleri");
             var ayarlarButton = CreateMenuButton("⚙️ Ayarlar");
-            
 
             // === Sol panel (sidebar) ===
             leftPanel = new StackLayout
@@ -85,14 +83,13 @@ namespace Gorevtakipv2
                     gecmisButton,
                     kayitButton,
                     ayarlarButton,
-                    
                 }
             };
 
             // === Sağ üst panel (header bar) ===
-            var anaSayfaButton = new Button { Text = "🏠️", FontSize = 22, BackgroundColor = Colors.Transparent };
-            var bildirimButton = new Button { Text = "🔔", FontSize = 22, BackgroundColor = Colors.Transparent };
-            var cikisButton = new Button { Text = "⏻", FontSize = 22, BackgroundColor = Colors.Transparent };
+            var anaSayfaButton = CreateTopButton("🏠️");
+            var bildirimButton = CreateTopButton("🔔");
+            var cikisButton = CreateTopButton("⏻");
 
             cikisButton.Clicked += async (s, e) =>
             {
@@ -211,9 +208,7 @@ namespace Gorevtakipv2
                 contentArea.Content = new adminpencere.Ayarlar();
             };
 
-           
-
-            // Sağ taraf için grid (üst panel + içerik)
+            // Sağ taraf grid
             var rightSideGrid = new Grid
             {
                 RowDefinitions =
@@ -227,7 +222,7 @@ namespace Gorevtakipv2
             rightSideGrid.Add(contentArea, 0, 1);
             Grid.SetRow(contentArea, 1);
 
-            // === Ana Grid (sol menü + sağ taraf) ===
+            // Ana Grid
             mainGrid = new Grid
             {
                 BackgroundColor = tema.BackgroundColor,
@@ -248,10 +243,10 @@ namespace Gorevtakipv2
             Content = mainGrid;
         }
 
-        // Ortak buton oluşturucu
+        // Menü butonları
         private Button CreateMenuButton(string text)
         {
-            return new Button
+            var btn = new Button
             {
                 Text = text,
                 HeightRequest = 55,
@@ -259,7 +254,40 @@ namespace Gorevtakipv2
                 FontSize = 16,
                 BackgroundColor = tema.CardColor,
                 TextColor = tema.TextColor,
-                CornerRadius = 12
+                CornerRadius = 12,
+                BorderWidth = 1,
+                BorderColor = tema.IsDark ? Colors.White : Colors.Gray, // kenarlık her temada var, sadece rengi değişiyor
+                Padding = new Thickness(10, 0)
+            };
+
+            if (!tema.IsDark)
+            {
+                btn.Shadow = new Shadow
+                {
+                    Brush = Brush.Black,
+                    Opacity = 0.08f,
+                    Radius = 4,
+                    Offset = new Point(2, 2)
+                };
+            }
+
+            return btn;
+        }
+
+        // Üst panel butonları
+        private Button CreateTopButton(string text)
+        {
+            return new Button
+            {
+                Text = text,
+                FontSize = 22,
+                BackgroundColor = Colors.Transparent,
+                TextColor = tema.TextColor,
+                WidthRequest = 50,
+                HeightRequest = 50,
+                CornerRadius = 25,
+                BorderWidth = 1,
+                BorderColor = tema.IsDark ? Colors.White : Colors.Gray
             };
         }
 
@@ -280,17 +308,37 @@ namespace Gorevtakipv2
 
             foreach (var child in leftPanel.Children)
             {
-                if (child is Label lbl) lbl.TextColor = tema.TextColor;
+                if (child is Label lbl)
+                    lbl.TextColor = tema.TextColor;
+
                 if (child is Button btn)
                 {
                     btn.BackgroundColor = tema.CardColor;
                     btn.TextColor = tema.TextColor;
+                    btn.BorderColor = tema.IsDark ? Colors.White : Colors.Gray;
+                    btn.BorderWidth = 1;
+
+                    if (!tema.IsDark)
+                        btn.Shadow = new Shadow
+                        {
+                            Brush = Brush.Black,
+                            Opacity = 0.08f,
+                            Radius = 4,
+                            Offset = new Point(2, 2)
+                        };
+                    else
+                        btn.Shadow = null;
                 }
             }
 
             foreach (var child in topPanel.Children)
             {
-                if (child is Button btn) btn.TextColor = tema.TextColor;
+                if (child is Button btn)
+                {
+                    btn.TextColor = tema.TextColor;
+                    btn.BorderColor = tema.IsDark ? Colors.White : Colors.Gray;
+                    btn.BorderWidth = 1;
+                }
             }
 
             if (contentArea.Content is Label lblContent)
@@ -299,6 +347,5 @@ namespace Gorevtakipv2
             if (contentArea.Content is ContentView cv)
                 cv.BackgroundColor = tema.BackgroundColor;
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using Gorevtakipv2.adminpncr;
 using Microcharts;
 using Microcharts.Maui;
 using Microsoft.Maui.Controls;
@@ -17,17 +18,17 @@ namespace Gorevtakipv2.adminpencere
         public IstatistikSayfasi(ObservableCollection<GorevModel> gorevler)
         {
             gorevler ??= new ObservableCollection<GorevModel>();
-            BackgroundColor = Color.FromArgb("#12121C");
+            BackgroundColor = tema.BackgroundColor;
 
             // --- KPI Kartları ---
             Frame CreateKpiCard(string title, string value, Color color)
             {
                 return new Frame
                 {
-                    CornerRadius = 14,
-                    Padding = new Thickness(14),
+                    CornerRadius = 16,
+                    Padding = new Thickness(16),
                     Margin = new Thickness(6, 0),
-                    BackgroundColor = Color.FromArgb("#1E1E2E"),
+                    BackgroundColor = tema.CardColor,
                     HasShadow = true,
                     Content = new StackLayout
                     {
@@ -38,7 +39,7 @@ namespace Gorevtakipv2.adminpencere
                             {
                                 Text = title,
                                 FontSize = 14,
-                                TextColor = Colors.Silver
+                                TextColor = tema.SecondaryText
                             },
                             new Label
                             {
@@ -52,10 +53,9 @@ namespace Gorevtakipv2.adminpencere
                 };
             }
 
-            // --- KPI Değerleri ---
-            var toplamKpi = CreateKpiCard("Toplam Görev", gorevler.Count.ToString(), Colors.White);
-            var tamamlananKpi = CreateKpiCard("Tamamlanan", gorevler.Count(g => g.Durum == "Tamamlandı").ToString(), Colors.LightGreen);
-            var gecikenKpi = CreateKpiCard("Geç Kalan", gorevler.Count(g => g.KalanSure == "Süre doldu").ToString(), Colors.OrangeRed);
+            var toplamKpi = CreateKpiCard("Toplam Görev", gorevler.Count.ToString(), tema.TextColor);
+            var tamamlananKpi = CreateKpiCard("Tamamlanan", gorevler.Count(g => g.Durum == "Tamamlandı").ToString(), tema.SuccessColor);
+            var gecikenKpi = CreateKpiCard("Geç Kalan", gorevler.Count(g => g.KalanSure == "Süre doldu").ToString(), tema.DangerColor);
 
             var kpiGrid = new Grid
             {
@@ -65,7 +65,7 @@ namespace Gorevtakipv2.adminpencere
                     new ColumnDefinition{ Width = GridLength.Star },
                     new ColumnDefinition{ Width = GridLength.Star }
                 },
-                Margin = new Thickness(0, 10, 0, 10)
+                Margin = new Thickness(0, 10)
             };
 
             kpiGrid.Children.Add(toplamKpi); Grid.SetColumn(toplamKpi, 0);
@@ -82,10 +82,10 @@ namespace Gorevtakipv2.adminpencere
                     ValueLabel = gr.Count().ToString(),
                     Color = gr.Key switch
                     {
-                        "Yüksek" => SKColor.Parse("#FF4500"),
-                        "Orta" => SKColor.Parse("#FFD700"),
-                        "Düşük" => SKColor.Parse("#32CD32"),
-                        _ => SKColor.Parse("#808080")
+                        "Yüksek" => SKColor.Parse(tema.DangerColor.ToHex()),
+                        "Orta" => SKColor.Parse(tema.WarningColor.ToHex()),
+                        "Düşük" => SKColor.Parse(tema.SuccessColor.ToHex()),
+                        _ => SKColor.Parse(tema.SecondaryText.ToHex())
                     }
                 }).ToList();
 
@@ -106,7 +106,7 @@ namespace Gorevtakipv2.adminpencere
                 {
                     Label = gr.Key,
                     ValueLabel = gr.Count().ToString(),
-                    Color = SKColor.Parse("#1E90FF")
+                    Color = SKColor.Parse(tema.AccentColor.ToHex())
                 }).ToList();
 
             var calisanChart = new ChartView
@@ -115,7 +115,8 @@ namespace Gorevtakipv2.adminpencere
                 Chart = new BarChart
                 {
                     Entries = calisanData,
-                    BackgroundColor = SKColors.Transparent
+                    BackgroundColor = SKColors.Transparent,
+                    LabelTextSize = 18
                 }
             };
 
@@ -131,7 +132,7 @@ namespace Gorevtakipv2.adminpencere
                     {
                         Label = tarih.ToString("dd.MM"),
                         ValueLabel = count.ToString(),
-                        Color = SKColor.Parse("#00CED1")
+                        Color = SKColor.Parse(tema.AccentColor.ToHex())
                     };
                 }).ToList();
 
@@ -143,9 +144,9 @@ namespace Gorevtakipv2.adminpencere
                     Entries = son7Gun,
                     BackgroundColor = SKColors.Transparent,
                     LineMode = LineMode.Straight,
-                    LineSize = 6,
+                    LineSize = 4,
                     PointMode = PointMode.Circle,
-                    PointSize = 14
+                    PointSize = 10
                 }
             };
 
@@ -162,19 +163,19 @@ namespace Gorevtakipv2.adminpencere
                         {
                             Text = "📊 Görev İstatistikleri",
                             FontSize = 26,
-                            TextColor = Color.FromArgb("#FFBF00"),
+                            TextColor = tema.AccentColor,
                             FontAttributes = FontAttributes.Bold
                         },
-                        new BoxView{ HeightRequest=2, Color=Color.FromArgb("#2E2E3E") },
+                        new BoxView{ HeightRequest=2, Color=tema.ButtonColor },
                         kpiGrid,
 
-                        new Label{ Text="Önemlilik Dağılımı", FontSize=20, TextColor=Colors.White },
+                        new Label{ Text="Önemlilik Dağılımı", FontSize=20, TextColor=tema.TextColor },
                         onemlilikChart,
 
-                        new Label{ Text="Çalışanlara Göre Görevler", FontSize=20, TextColor=Colors.White },
+                        new Label{ Text="Çalışanlara Göre Görevler", FontSize=20, TextColor=tema.TextColor },
                         calisanChart,
 
-                        new Label{ Text="Son 7 Gün Tamamlanan Görevler", FontSize=20, TextColor=Colors.White },
+                        new Label{ Text="Son 7 Gün Tamamlanan Görevler", FontSize=20, TextColor=tema.TextColor },
                         gunlukChart
                     }
                 }
