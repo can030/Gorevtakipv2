@@ -133,7 +133,7 @@ namespace Gorevtakipv2.adminpencere
             // === Önemlilik ===
             onemlilikPicker = new Picker
             {
-                Title = "⭐ Önemlilik",
+                Title = "⭐ Önemlilik Seç",
                 ItemsSource = new string[] { "Düşük", "Orta", "Yüksek" },
                 TextColor = tema.TextColor,
                 TitleColor = tema.TextColor,

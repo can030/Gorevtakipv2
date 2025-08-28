@@ -121,14 +121,14 @@ namespace Gorevtakipv2.adminpencere
             switch (temaPicker.SelectedItem?.ToString())
             {
                 case "Açık":
-                    tema.garatema();
+                    tema.AcikTema();
                     break;
                 case "Koyu":
-                    tema.beyaztema();
+                    tema.KoyuTema();
                     break;
             }
 
-            // Ana sayfayı güncelle
+            // Ana sayfayı güncelleff
             (Application.Current.MainPage as Admin)?.RefreshTheme();
 
             // Ayarlar sayfasını anlık güncelle
