@@ -1,34 +1,28 @@
-﻿using Gorevtakipv2.adminpencere;
-using Microsoft.Maui.Controls;
-using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SkiaSharp.Views.Maui.Controls;
-using SkiaSharp;
-using Microcharts.Maui;
 using Gorevtakipv2.adminpncr;
+using Gorevtakipv2.kullanicipncr;
+
+
 
 namespace Gorevtakipv2
 {
-    public class Admin : ContentPage
+    public class kullanici : ContentPage
     {
         sqlbaglanti bgl = new sqlbaglanti();
-
         private Grid mainGrid;
         private StackLayout leftPanel;
         private Grid topPanel;
         private ContentView contentArea;
-        private Label headerTitleLabel;
 
-        public Admin()
+        public kullanici()
         {
             string adSoyad = Session.AdSoyad;
             string yetki = Session.Yetki;
-            Title = "Admin Paneli";
+            Title = "Kullanıcı Paneli";
 
             // === Kullanıcı bilgileri ===
             var profileImage = new Image
@@ -57,15 +51,12 @@ namespace Gorevtakipv2
                 HorizontalOptions = LayoutOptions.Center
             };
 
-            // === Menü butonları ===
-            var gorevlerButton = CreateMenuButton("Görevler");
-            var aktifGorevlerButton = CreateMenuButton("Aktif Görevler");
-            var istatistikButton = CreateMenuButton("İstatistik");
-            var gecmisButton = CreateMenuButton("Geçmiş");
-            var kayitButton = CreateMenuButton("Kayıt İşlemleri");
-            var ayarlarButton = CreateMenuButton("Ayarlar");
+            // Menü butonları
+            var klncaktifGorevlerButton = CreateMenuButton("📝 Görevler");
+            var klncistatistikButton = CreateMenuButton("📊 İstatistik");
+            var klncgecmisButton = CreateMenuButton("📂 Geçmiş");
+            var klncayarlarButton = CreateMenuButton("⚙️ Ayarlar");
 
-            // === Sol panel (sidebar) ===
             leftPanel = new StackLayout
             {
                 Orientation = StackOrientation.Vertical,
@@ -78,17 +69,46 @@ namespace Gorevtakipv2
                     nameLabel,
                     roleLabel,
                     new BoxView { HeightRequest = 2, Color = Colors.Gray, Margin = new Thickness(0,10) },
-                    gorevlerButton,
-                    aktifGorevlerButton,
-                    istatistikButton,
-                    gecmisButton,
-                    kayitButton,
-                    ayarlarButton,
+
+                    klncaktifGorevlerButton,
+                    klncistatistikButton,
+                    klncgecmisButton,
+                    klncayarlarButton,
                 }
             };
+            // sol panel buton aktifleştirme 
 
-            // === Sağ üst panel (header bar) ===
-            var anaSayfaButton = CreateTopButton("🏠");
+            klncaktifGorevlerButton.Clicked += async (s, e) =>
+            {
+                await AnimateButton(klncaktifGorevlerButton);
+                contentArea.Content = new kullanicipncr.Klncgorev();
+
+            };
+            klncistatistikButton.Clicked += async (s, e) =>
+            {
+                await AnimateButton(klncistatistikButton);
+                contentArea.Content = new kullanicipncr.KlncIstatistik(Session.AdSoyad);
+
+            };
+            klncgecmisButton.Clicked += async (s, e) =>
+            {
+                await AnimateButton(klncgecmisButton);
+                contentArea.Content = new kullanicipncr.KlncGecmis();
+
+            };
+            klncayarlarButton.Clicked += async (s, e) =>
+            {
+                await AnimateButton(klncayarlarButton);
+                contentArea.Content = new kullanicipncr.klncayar();
+            };
+               
+
+            
+
+
+
+            // Üst panel butonları
+            var anaSayfaButton = CreateTopButton("🏠️");
             var bildirimButton = CreateTopButton("🔔");
             var cikisButton = CreateTopButton("⏻");
 
@@ -101,17 +121,6 @@ namespace Gorevtakipv2
                     Session.Yetki = null;
                     Application.Current.MainPage = new Login();
                 }
-            };
-
-            // === Ortadaki Başlık ===
-            headerTitleLabel = new Label
-            {
-                Text = "Admin Paneli",
-                FontSize = 22,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = tema.AccentColor,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center
             };
 
             topPanel = new Grid
@@ -127,18 +136,17 @@ namespace Gorevtakipv2
                     new ColumnDefinition { Width = GridLength.Auto }
                 }
             };
-
-            topPanel.Add(headerTitleLabel, 0, 0);
             topPanel.Add(anaSayfaButton, 1, 0);
             topPanel.Add(bildirimButton, 2, 0);
             topPanel.Add(cikisButton, 3, 0);
 
-            // === İçerik alanı ===
+            // İçerik alanı
             contentArea = new ContentView
             {
+                BackgroundColor = tema.BackgroundColor,
                 Content = new Label
                 {
-                    Text = "Admin Paneline Hoşgeldiniz!",
+                    Text = "Kullanıcı Paneline Hoşgeldiniz! 🎉",
                     FontSize = 26,
                     FontAttributes = FontAttributes.Bold,
                     TextColor = tema.TextColor,
@@ -147,120 +155,33 @@ namespace Gorevtakipv2
                 }
             };
 
-            // Menü butonlarına tıklama -> içerik değiştir + başlık güncelle
-            gorevlerButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(gorevlerButton);
-                await SetHeaderTitle("Görevler");
-                contentArea.Content = new adminpencere.gorevpncr();
-            };
-
-            aktifGorevlerButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(aktifGorevlerButton);
-                await SetHeaderTitle("Aktif Görevler");
-                contentArea.Content = new adminpencere.aktifgorevler();
-            };
-
-            istatistikButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(istatistikButton);
-                await SetHeaderTitle("İstatistik");
-
-                var gorevlerListesi = new ObservableCollection<GorevModel>();
-                using (var conn = new sqlbaglanti().Connection())
-                {
-                    await conn.OpenAsync();
-                    string sql = @"SELECT g.baslik, g.aciklama, g.onemlilik, 
-                              p.ad as calisan, g.baslangic_zamani, g.bitis_zamani 
-                       FROM gorevler g 
-                       JOIN personel_bilgi p ON g.calisan_id = p.id 
-                       ORDER BY g.id DESC";
-
-                    using (var cmd = new MySqlCommand(sql, conn))
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            string onem = reader["onemlilik"].ToString();
-                            Color renk = Colors.LightGray;
-                            if (onem == "Yüksek") renk = Colors.OrangeRed;
-                            else if (onem == "Orta") renk = Colors.Gold;
-                            else if (onem == "Düşük") renk = Colors.LightGreen;
-
-                            gorevlerListesi.Add(new GorevModel
-                            {
-                                Baslik = reader["baslik"].ToString(),
-                                Calisan = reader["calisan"].ToString(),
-                                Zaman = $"{Convert.ToDateTime(reader["baslangic_zamani"]):dd.MM.yyyy HH:mm} - {Convert.ToDateTime(reader["bitis_zamani"]):dd.MM.yyyy HH:mm}",
-                                Onemlilik = onem,
-                                OnemlilikRenk = renk,
-                                Aciklama = reader["aciklama"].ToString(),
-                                BitisZamani = Convert.ToDateTime(reader["bitis_zamani"])
-                            });
-                        }
-                    }
-                }
-                contentArea.Content = new adminpencere.IstatistikSayfasi(gorevlerListesi);
-            };
-
-            gecmisButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(gecmisButton);
-                await SetHeaderTitle("Geçmiş");
-                contentArea.Content = new adminpencere.gecmis();
-            };
-
-            kayitButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(kayitButton);
-                await SetHeaderTitle("Kayıt İşlemleri");
-                contentArea.Content = new adminpencere.Kayit();
-            };
-
-            ayarlarButton.Clicked += async (s, e) =>
-            {
-                await AnimateButton(ayarlarButton);
-                await SetHeaderTitle("Ayarlar");
-                contentArea.Content = new adminpencere.Ayarlar();
-            };
-
-            // Sağ taraf grid
-            var rightSideGrid = new Grid
-            {
-                RowDefinitions =
-                {
-                    new RowDefinition { Height = 70 },
-                    new RowDefinition { Height = GridLength.Star }
-                }
-            };
-
-            rightSideGrid.Add(topPanel, 0, 0);
-            rightSideGrid.Add(contentArea, 0, 1);
-            Grid.SetRow(contentArea, 1);
-
-            // Ana Grid
+            // === Ana Grid ===
             mainGrid = new Grid
             {
                 BackgroundColor = tema.BackgroundColor,
-                RowDefinitions =
-                {
-                    new RowDefinition { Height = GridLength.Star }
-                },
                 ColumnDefinitions =
                 {
-                    new ColumnDefinition { Width = 220 },
+                    new ColumnDefinition { Width = new GridLength(220) },
                     new ColumnDefinition { Width = GridLength.Star }
+                },
+                RowDefinitions =
+                {
+                    new RowDefinition { Height = new GridLength(70) },
+                    new RowDefinition { Height = GridLength.Star }
                 }
             };
 
+            // Yerleşim
             mainGrid.Add(leftPanel, 0, 0);
-            mainGrid.Add(rightSideGrid, 1, 0);
+            Grid.SetRowSpan(leftPanel, 2); // sol panel tam yükseklik
+
+            mainGrid.Add(topPanel, 1, 0);
+            mainGrid.Add(contentArea, 1, 1);
 
             Content = mainGrid;
         }
 
-        // Menü butonları
+        // Menü düğmesi
         private Button CreateMenuButton(string text)
         {
             var btn = new Button
@@ -287,21 +208,22 @@ namespace Gorevtakipv2
                     Offset = new Point(2, 2)
                 };
             }
+
             return btn;
         }
 
-        // Üst panel butonları
+        // Üst düğme
         private Button CreateTopButton(string text)
         {
             return new Button
             {
                 Text = text,
-                FontSize = 20,
+                FontSize = 22,
                 BackgroundColor = Colors.Transparent,
                 TextColor = tema.TextColor,
-                WidthRequest = 45,
-                HeightRequest = 45,
-                CornerRadius = 22,
+                WidthRequest = 50,
+                HeightRequest = 50,
+                CornerRadius = 25,
                 BorderWidth = 1,
                 BorderColor = tema.IsDark ? Colors.White : Colors.Gray
             };
@@ -310,16 +232,8 @@ namespace Gorevtakipv2
         // Buton animasyonu
         private async Task AnimateButton(Button button)
         {
-            await button.ScaleTo(0.9, 100, Easing.CubicOut);
+            await button.ScaleTo(1.1, 100, Easing.CubicOut);
             await button.ScaleTo(1.0, 100, Easing.CubicIn);
-        }
-
-        // Başlığı zoom animasyonu ile değiştir
-        private async Task SetHeaderTitle(string text)
-        {
-            await headerTitleLabel.ScaleTo(0.8, 120, Easing.CubicIn);
-            headerTitleLabel.Text = text;
-            await headerTitleLabel.ScaleTo(1.0, 120, Easing.CubicOut);
         }
 
         // Tema yenileme

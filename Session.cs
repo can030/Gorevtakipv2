@@ -12,6 +12,7 @@ namespace Gorevtakipv2
     {
         public static string AdSoyad { get; set; }
         public static string Yetki { get; set; }
+        public static int ID { get; set; }
     }
 
 }

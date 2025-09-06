@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Gorevtakipv2.kullanicipncr;
 
 namespace Gorevtakipv2.adminpencere
 {
@@ -151,35 +152,67 @@ namespace Gorevtakipv2.adminpencere
             };
 
             // --- Scrollable içerik ---
-            Content = new ScrollView
+            if (gorevler.Count == 0)
             {
-                Content = new StackLayout
+                Content = new Grid
                 {
-                    Padding = 16,
-                    Spacing = 16,
+                    BackgroundColor = tema.BackgroundColor,
                     Children =
+            {
+            new StackLayout
+            {
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center,
+                Spacing = 12,
+                Children =
+                {
+                    
+                    new Label
                     {
-                        new Label
-                        {
-                            Text = "📊 Görev İstatistikleri",
-                            FontSize = 26,
-                            TextColor = tema.AccentColor,
-                            FontAttributes = FontAttributes.Bold
-                        },
-                        new BoxView{ HeightRequest=2, Color=tema.ButtonColor },
-                        kpiGrid,
-
-                        new Label{ Text="Önemlilik Dağılımı", FontSize=20, TextColor=tema.TextColor },
-                        onemlilikChart,
-
-                        new Label{ Text="Çalışanlara Göre Görevler", FontSize=20, TextColor=tema.TextColor },
-                        calisanChart,
-
-                        new Label{ Text="Son 7 Gün Tamamlanan Görevler", FontSize=20, TextColor=tema.TextColor },
-                        gunlukChart
+                        Text = "Sonuç bulunamadı",
+                        FontSize = 20,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = tema.SecondaryText,
+                        HorizontalTextAlignment = TextAlignment.Center
+                    },
+                    new Label
+                    {
+                        Text = "Henüz görüntülenecek görev istatistiği yok.",
+                        FontSize = 14,
+                        TextColor = tema.TextColor,
+                        HorizontalTextAlignment = TextAlignment.Center
                     }
                 }
-            };
+            }
+        }
+                };
+            }
+            else
+            {
+                Content = new ScrollView
+                {
+                    Content = new StackLayout
+                    {
+                        Padding = 16,
+                        Spacing = 16,
+                        Children =
+            {
+               
+                new BoxView{ HeightRequest=2, Color=tema.ButtonColor },
+                kpiGrid,
+
+                new Label{ Text="Önemlilik Dağılımı", FontSize=20, TextColor=tema.TextColor },
+                onemlilikChart,
+
+                new Label{ Text="Çalışanlara Göre Görevler", FontSize=20, TextColor=tema.TextColor },
+                calisanChart,
+
+                new Label{ Text="Son 7 Gün Tamamlanan Görevler", FontSize=20, TextColor=tema.TextColor },
+                gunlukChart
+            }
+                    }
+                };
+            }
         }
     }
 }

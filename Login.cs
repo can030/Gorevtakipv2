@@ -65,7 +65,7 @@ namespace Gorevtakipv2
                     {
                         await conn.OpenAsync();
 
-                        string sql = "SELECT yetki, ad, soyad FROM personel_bilgi WHERE email=@pEmail AND parola=@pParola;";
+                        string sql = "SELECT id, yetki, ad, soyad FROM personel_bilgi WHERE email=@pEmail AND parola=@pParola;";
                         using (MySqlCommand command = new MySqlCommand(sql, conn))
                         {
                             command.Parameters.AddWithValue("@pEmail", email);
@@ -78,19 +78,17 @@ namespace Gorevtakipv2
                                     string yetki = reader["yetki"].ToString();
                                     string ad = reader["ad"].ToString();
                                     string soyad = reader["soyad"].ToString();
+                                    int kullaniciId = Convert.ToInt32(reader["id"]); // <== artık küçük harf ile
 
                                     // 🔹 Session bilgilerini kaydet
                                     Session.AdSoyad = ad + " " + soyad;
                                     Session.Yetki = yetki;
+                                    Session.ID = kullaniciId;
 
                                     if (yetki == "admin")
                                         Application.Current.MainPage = new Admin();
                                     else
-                                    {
-                                        // Application.Current.MainPage = new KullaniciPage();
-
-                                    }
-
+                                        Application.Current.MainPage = new kullanici();
                                 }
                                 else
                                 {

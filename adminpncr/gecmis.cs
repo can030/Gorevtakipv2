@@ -18,6 +18,7 @@ namespace Gorevtakipv2.adminpencere
             {
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    Padding = 15;
                     var importanceDot = new BoxView
                     {
                         WidthRequest = 12,
@@ -64,26 +65,26 @@ namespace Gorevtakipv2.adminpencere
                         Orientation = StackOrientation.Horizontal,
                         Spacing = 18,
                         Children =
-                        {
-                            new StackLayout
-                            {
-                                Orientation = StackOrientation.Horizontal,
-                                Spacing = 4,
-                                Children = { new Label{Text="👤", TextColor = tema.TextColor}, calisanLbl }
-                            },
-                            new StackLayout
-                            {
-                                Orientation = StackOrientation.Horizontal,
-                                Spacing = 4,
-                                Children = { new Label{Text="⏳", TextColor = tema.TextColor}, zamanLbl }
-                            },
-                            new StackLayout
-                            {
-                                Orientation = StackOrientation.Horizontal,
-                                Spacing = 4,
-                                Children = { new Label{Text="⚡", TextColor = tema.TextColor}, onemLbl }
-                            }
-                        }
+                {
+                    new StackLayout
+                    {
+                        Orientation = StackOrientation.Horizontal,
+                        Spacing = 4,
+                        Children = { new Label{Text="👤", TextColor = tema.TextColor}, calisanLbl }
+                    },
+                    new StackLayout
+                    {
+                        Orientation = StackOrientation.Horizontal,
+                        Spacing = 4,
+                        Children = { new Label{Text="⏳", TextColor = tema.TextColor}, zamanLbl }
+                    },
+                    new StackLayout
+                    {
+                        Orientation = StackOrientation.Horizontal,
+                        Spacing = 4,
+                        Children = { new Label{Text="⚡", TextColor = tema.TextColor}, onemLbl }
+                    }
+                }
                     };
 
                     var aciklamaLbl = new Label
@@ -116,16 +117,16 @@ namespace Gorevtakipv2.adminpencere
                     {
                         Spacing = 8,
                         Children =
-                        {
-                            new StackLayout
-                            {
-                                Orientation = StackOrientation.Horizontal,
-                                Children = { importanceDot, baslikLbl }
-                            },
-                            infoRow,
-                            aciklamaFrame,
-                            bittiLbl
-                        }
+                {
+                    new StackLayout
+                    {
+                        Orientation = StackOrientation.Horizontal,
+                        Children = { importanceDot, baslikLbl }
+                    },
+                    infoRow,
+                    aciklamaFrame,
+                    bittiLbl
+                }
                     };
 
                     return new Frame
@@ -138,32 +139,52 @@ namespace Gorevtakipv2.adminpencere
                         BorderColor = tema.ButtonColor,
                         Content = contentStack
                     };
-                })
+                }),
+
+                // 📌 Liste boşsa gösterilecek modern mesaj
+                EmptyView = new StackLayout
+                {
+                    VerticalOptions = LayoutOptions.Center,
+                    HorizontalOptions = LayoutOptions.Center,
+                    Spacing = 12,
+                    Children =
+            {
+                new Image
+                {
+                    Source = "empty.png", // boş veri için görsel (Resources/Images içine ekle)
+                    HeightRequest = 120,
+                    Opacity = 0.6
+                },
+                new Label
+                {
+                    Text = "Geçmiş görev bulunamadı",
+                    FontSize = 20,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = tema.SecondaryText,
+                    HorizontalTextAlignment = TextAlignment.Center
+                },
+                new Label
+                {
+                    Text = "Henüz tamamlanmış görev yok.",
+                    FontSize = 14,
+                    TextColor = tema.TextColor,
+                    HorizontalTextAlignment = TextAlignment.Center
+                }
+            }
+                }
             };
 
             var mainGrid = new Grid
             {
                 RowDefinitions =
-                {
-                    new RowDefinition { Height = GridLength.Auto },
-                    new RowDefinition { Height = GridLength.Star }
-                },
+        {
+            new RowDefinition { Height = GridLength.Auto },
+            new RowDefinition { Height = GridLength.Star }
+        },
                 BackgroundColor = tema.BackgroundColor
             };
 
-            var lblTitle = new Label
-            {
-                Text = "📜 Geçmiş Görevler",
-                FontSize = 24,
-                TextColor = tema.AccentColor,
-                FontAttributes = FontAttributes.Bold,
-                Margin = new Thickness(20, 15, 10, 10)
-            };
-
-            Grid.SetRow(lblTitle, 0);
-            Grid.SetRow(gorevListView, 1);
-
-            mainGrid.Children.Add(lblTitle);
+            
             mainGrid.Children.Add(gorevListView);
 
             Content = mainGrid;
