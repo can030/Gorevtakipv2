@@ -22,10 +22,11 @@ namespace Gorevtakipv2
         private StackLayout leftPanel;
         private Grid topPanel;
         private ContentView contentArea;
-        private Label headerTitleLabel;
+        private Label titleLabel;
 
         public Admin()
         {
+            tema.TemaDegisti += RefreshTheme;
             string adSoyad = Session.AdSoyad;
             string yetki = Session.Yetki;
             Title = "Admin Paneli";
@@ -104,12 +105,12 @@ namespace Gorevtakipv2
             };
 
             // === Ortadaki Başlık ===
-            headerTitleLabel = new Label
+            titleLabel = new Label
             {
                 Text = "Admin Paneli",
                 FontSize = 22,
                 FontAttributes = FontAttributes.Bold,
-                TextColor = tema.AccentColor,
+                TextColor = tema.TextColor,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
             };
@@ -128,7 +129,8 @@ namespace Gorevtakipv2
                 }
             };
 
-            topPanel.Add(headerTitleLabel, 0, 0);
+            topPanel.Add(titleLabel, 0, 0);
+            Grid.SetColumnSpan(titleLabel, 4);
             topPanel.Add(anaSayfaButton, 1, 0);
             topPanel.Add(bildirimButton, 2, 0);
             topPanel.Add(cikisButton, 3, 0);
@@ -317,9 +319,9 @@ namespace Gorevtakipv2
         // Başlığı zoom animasyonu ile değiştir
         private async Task SetHeaderTitle(string text)
         {
-            await headerTitleLabel.ScaleTo(0.8, 120, Easing.CubicIn);
-            headerTitleLabel.Text = text;
-            await headerTitleLabel.ScaleTo(1.0, 120, Easing.CubicOut);
+            await titleLabel.ScaleTo(0.8, 120, Easing.CubicIn);
+            titleLabel.Text = text;
+            await titleLabel.ScaleTo(1.0, 120, Easing.CubicOut);
         }
 
         // Tema yenileme
@@ -364,6 +366,9 @@ namespace Gorevtakipv2
                     btn.BorderWidth = 1;
                 }
             }
+
+            // ✔ Başlık da güncellensin
+            titleLabel.TextColor = tema.TextColor;
 
             if (contentArea.Content is Label lblContent)
                 lblContent.TextColor = tema.TextColor;

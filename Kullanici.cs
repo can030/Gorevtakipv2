@@ -17,9 +17,12 @@ namespace Gorevtakipv2
         private StackLayout leftPanel;
         private Grid topPanel;
         private ContentView contentArea;
+        private Label titleLabel; // üst panel başlığı
 
         public kullanici()
         {
+            tema.TemaDegisti += RefreshTheme;
+
             string adSoyad = Session.AdSoyad;
             string yetki = Session.Yetki;
             Title = "Kullanıcı Paneli";
@@ -76,41 +79,85 @@ namespace Gorevtakipv2
                     klncayarlarButton,
                 }
             };
-            // sol panel buton aktifleştirme 
 
+            // üst panel başlık
+            // üst panel başlık
+            titleLabel = new Label
+            {
+                Text = "Ana Sayfa",
+                FontSize = 22,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = tema.TextColor,
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Center // ✔ ortalı yaptım
+            };
+
+            // === Üst panel ===
+            topPanel = new Grid
+            {
+                BackgroundColor = tema.CardColor,
+                HeightRequest = 70,
+                Padding = new Thickness(10),
+                ColumnDefinitions =
+    {
+        new ColumnDefinition { Width = GridLength.Star },   // başlık için alan
+        new ColumnDefinition { Width = GridLength.Auto },   // 🏠
+        new ColumnDefinition { Width = GridLength.Auto },   // 🔔
+        new ColumnDefinition { Width = GridLength.Auto }    // ⏻
+    }
+            };
+
+            // Başlığı ekle ve 4 sütuna yay
+            topPanel.Add(titleLabel, 0, 0);
+            Grid.SetColumnSpan(titleLabel, 4);
+
+            // Sağdaki butonlar
+            
+
+            // sol panel buton aktifleştirme 
             klncaktifGorevlerButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(klncaktifGorevlerButton);
                 contentArea.Content = new kullanicipncr.Klncgorev();
-
+                await UpdateTitle("Görevler");
             };
             klncistatistikButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(klncistatistikButton);
                 contentArea.Content = new kullanicipncr.KlncIstatistik(Session.AdSoyad);
-
+                await UpdateTitle("İstatistik");
             };
             klncgecmisButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(klncgecmisButton);
                 contentArea.Content = new kullanicipncr.KlncGecmis();
-
+                await UpdateTitle("Geçmiş");
             };
             klncayarlarButton.Clicked += async (s, e) =>
             {
                 await AnimateButton(klncayarlarButton);
                 contentArea.Content = new kullanicipncr.klncayar();
+                await UpdateTitle("Ayarlar");
             };
-               
-
-            
-
-
 
             // Üst panel butonları
             var anaSayfaButton = CreateTopButton("🏠️");
             var bildirimButton = CreateTopButton("🔔");
             var cikisButton = CreateTopButton("⏻");
+
+            anaSayfaButton.Clicked += async (s, e) =>
+            {
+                contentArea.Content = new Label
+                {
+                    Text = "Kullanıcı Paneline Hoşgeldiniz! 🎉",
+                    FontSize = 26,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = tema.TextColor,
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center
+                };
+                await UpdateTitle("Ana Sayfa");
+            };
 
             cikisButton.Clicked += async (s, e) =>
             {
@@ -136,6 +183,7 @@ namespace Gorevtakipv2
                     new ColumnDefinition { Width = GridLength.Auto }
                 }
             };
+            topPanel.Add(titleLabel, 0, 0); // başlık sola
             topPanel.Add(anaSayfaButton, 1, 0);
             topPanel.Add(bildirimButton, 2, 0);
             topPanel.Add(cikisButton, 3, 0);
@@ -236,6 +284,14 @@ namespace Gorevtakipv2
             await button.ScaleTo(1.0, 100, Easing.CubicIn);
         }
 
+        // Başlık güncelleme + zoom animasyonu
+        private async Task UpdateTitle(string text)
+        {
+            titleLabel.Text = text;
+            await titleLabel.ScaleTo(1.2, 120, Easing.CubicOut);
+            await titleLabel.ScaleTo(1.0, 120, Easing.CubicIn);
+        }
+
         // Tema yenileme
         public void RefreshTheme()
         {
@@ -243,6 +299,8 @@ namespace Gorevtakipv2
             leftPanel.BackgroundColor = tema.CardColor;
             topPanel.BackgroundColor = tema.CardColor;
             contentArea.BackgroundColor = tema.BackgroundColor;
+
+            titleLabel.TextColor = tema.TextColor;
 
             foreach (var child in leftPanel.Children)
             {

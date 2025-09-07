@@ -27,8 +27,10 @@ namespace Gorevtakipv2.adminpencere
             {
                 ItemTemplate = new DataTemplate(() =>
                 {
+                    Padding = 15;
                     var importanceDot = new BoxView
                     {
+                        
                         WidthRequest = 12,
                         HeightRequest = 12,
                         CornerRadius = 6,

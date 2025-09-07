@@ -23,11 +23,14 @@ namespace Gorevtakipv2.adminpncr
 
         public static bool IsDark { get; private set; }
 
+        // 📢 Tema değiştiğinde tetiklenecek event
+        public static event Action TemaDegisti;
+
         // 🌙 Koyu Tema
         public static void KoyuTema()
         {
             BackgroundColor = Color.FromArgb("#12121C");
-            PlaceholderColor = Color.FromArgb("#4B5563"); // gri placeholder
+            PlaceholderColor = Color.FromArgb("#4B5563");
             CardColor = Color.FromArgb("#1E1E2C");
             EntryBackground = Color.FromArgb("#2A2A3C");
             TextColor = Colors.White;
@@ -38,13 +41,15 @@ namespace Gorevtakipv2.adminpncr
             WarningColor = Color.FromArgb("#FFC107");
             DangerColor = Color.FromArgb("#F44336");
             IsDark = true;
+
+            TemaDegisti?.Invoke(); // 🔔 haber ver
         }
 
         // ☀️ Açık Tema
         public static void AcikTema()
         {
             BackgroundColor = Color.FromArgb("#F9FAFB");
-            PlaceholderColor = Color.FromArgb("#9CA3AF"); // gri placeholder
+            PlaceholderColor = Color.FromArgb("#9CA3AF");
             CardColor = Colors.White;
             EntryBackground = Color.FromArgb("#F3F4F6");
             TextColor = Color.FromArgb("#111827");
@@ -55,6 +60,8 @@ namespace Gorevtakipv2.adminpncr
             WarningColor = Color.FromArgb("#F59E0B");
             DangerColor = Color.FromArgb("#DC2626");
             IsDark = false;
+
+            TemaDegisti?.Invoke(); // 🔔 haber ver
         }
     }
 }
