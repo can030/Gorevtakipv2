@@ -104,6 +104,11 @@ namespace Gorevtakipv2
                 }
             };
 
+            passwordEntry.Completed += async (s, e) =>
+            {
+                loginButton.SendClicked();
+            };
+
             Content = new StackLayout
             {
                 Padding = 10,
